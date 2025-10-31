@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chromnotes</title>
+  </head>
+  <body data-theme="dark">
+    <div class="app">
+      <header class="app-header">
+        <div class="title-group">
+          <h1>Chromnotes</h1>
+          <p class="subtitle">Capture quick notes every time you open a new tab.</p>
+        </div>
+        <div class="header-actions">
+          <div class="settings-container">
+            <button
+              id="settingsButton"
+              class="ghost-button icon-button"
+              type="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="settingsPanel"
+            >
+              ⚙️
+            </button>
+            <div
+              id="settingsPanel"
+              class="settings-panel hidden"
+              role="dialog"
+              aria-label="Appearance settings"
+              hidden
+            >
+              <h3 class="settings-panel-title">Appearance</h3>
+              <div class="theme-options" role="radiogroup" aria-label="Theme">
+                <label class="theme-option" data-theme="light">
+                  <input type="radio" name="themeChoice" value="light" />
+                  <span class="theme-option-name">Light</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip"></span>
+                    <span class="color-chip" data-color="green"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="dawn">
+                  <input type="radio" name="themeChoice" value="dawn" />
+                  <span class="theme-option-name">Dawn Glow</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                    <span class="color-chip" data-color="purple"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="paper">
+                  <input type="radio" name="themeChoice" value="paper" />
+                  <span class="theme-option-name">Paper White</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="green"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="dark">
+                  <input type="radio" name="themeChoice" value="dark" />
+                  <span class="theme-option-name">Midnight</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="dracula">
+                  <input type="radio" name="themeChoice" value="dracula" />
+                  <span class="theme-option-name">Dracula</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="green"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                    <span class="color-chip" data-color="purple"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="midnight">
+                  <input type="radio" name="themeChoice" value="midnight" />
+                  <span class="theme-option-name">Midnight Deep</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                    <span class="color-chip" data-color="purple"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="forest">
+                  <input type="radio" name="themeChoice" value="forest" />
+                  <span class="theme-option-name">Forest Night</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="green"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="github">
+                  <input type="radio" name="themeChoice" value="github" />
+                  <span class="theme-option-name">GitHub Dark</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                  </span>
+                </label>
+                <label class="theme-option" data-theme="girly-girl">
+                  <input type="radio" name="themeChoice" value="girly-girl" />
+                  <span class="theme-option-name">Girly Girl</span>
+                  <span class="theme-option-swatches">
+                    <span class="color-chip" data-color="yellow"></span>
+                    <span class="color-chip" data-color="cyan"></span>
+                    <span class="color-chip" data-color="purple"></span>
+                  </span>
+                </label>
+              </div>
+              <div class="settings-divider" role="separator"></div>
+              <div class="settings-subtitle">Layout</div>
+              <div class="layout-options" role="radiogroup" aria-label="View mode">
+                <label class="layout-option" data-layout="list">
+                  <input type="radio" name="layoutChoice" value="list" />
+                  <span>List</span>
+                </label>
+                <label class="layout-option" data-layout="desktop">
+                  <input type="radio" name="layoutChoice" value="desktop" />
+                  <span>Desktop</span>
+                </label>
+              </div>
+              <label class="toggle-row" for="compactToggle">
+                <div class="toggle-copy">
+                  <span class="toggle-title">Compact note cards</span>
+                  <span class="toggle-description">Show more notes with denser spacing</span>
+                </div>
+                <input type="checkbox" id="compactToggle" />
+              </label>
+              <!-- TODO: Enable sync toggle when UX/support is finalized -->
+              <div class="settings-subtitle hidden">Sync</div>
+              <label class="toggle-row hidden" for="syncToggle">
+                <div class="toggle-copy">
+                  <span class="toggle-title">Sync across devices</span>
+                  <span class="toggle-description">Keep notes and settings using Chrome sync</span>
+                </div>
+                <input type="checkbox" id="syncToggle" />
+              </label>
+            </div>
+          </div>
+          <label class="theme-toggle">
+            <input type="checkbox" id="themeToggle" />
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">Dark mode</span>
+          </label>
+          <a
+            id="donateButton"
+            class="donate-button"
+            href="https://buymeacoffee.com/rodrigodeld"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Donate
+          </a>
+          <button id="newNoteButton" class="ghost-button" type="button">New note</button>
+        </div>
+      </header>
+      <div class="layout-columns">
+        <main class="main-content">
+          <section class="notes-panel">
+            <div class="list-header">
+              <h2>Notes</h2>
+              <input id="searchInput" type="search" placeholder="Search notes..." />
+              <select id="categoryFilter" aria-label="Filter by category"></select>
+            </div>
+            <ul id="notesContainer" aria-live="polite"></ul>
+            <p id="emptyState" class="empty-state">No notes yet. Start writing and they will appear here.</p>
+            <nav
+              id="paginationControls"
+              class="pagination hidden"
+              aria-label="Notes pagination"
+              hidden
+            >
+              <button id="prevPageButton" class="ghost-button" type="button">Previous</button>
+              <span id="paginationStatus" class="pagination-status" aria-live="polite"></span>
+              <button id="nextPageButton" class="ghost-button" type="button">Next</button>
+            </nav>
+          </section>
+        </main>
+        <div id="modalBackdrop" class="modal-backdrop hidden" role="presentation" hidden>
+          <div id="noteModal" class="modal" role="dialog" aria-modal="true" aria-label="Chromnotes editor">
+            <header class="modal-header">
+              <div class="modal-header-actions">
+                <button id="modalMaximizeButton" class="ghost-button icon-button" type="button" aria-label="Maximize note editor">
+                  ⤢
+                </button>
+                <button id="modalDeleteButton" class="ghost-button icon-button danger-icon" type="button" aria-label="Delete note" disabled>
+                  🗑️
+                </button>
+                <button id="modalCancelButton" class="ghost-button icon-button" type="button" aria-label="Close">
+                  ✕
+                </button>
+                <button id="modalSaveButton" class="ghost-button icon-button" type="submit" aria-label="Save note" form="noteForm">
+                  💾
+                </button>
+              </div>
+            </header>
+            <form id="noteForm" class="modal-form" autocomplete="off">
+              <input type="hidden" id="noteId" />
+              <div class="field">
+                <label for="noteTitle">Title</label>
+                <input id="noteTitle" name="noteTitle" type="text" placeholder="Give your note a title" />
+              </div>
+              <div class="field">
+                <label for="noteCategory">Category</label>
+                <input id="noteCategory" name="noteCategory" type="text" placeholder="e.g. Planning, Research, Personal" />
+              </div>
+              <div class="field field--grow">
+                <label for="noteContent">Note</label>
+                <div id="noteContent" class="editor" role="textbox" aria-multiline="true" contenteditable="true" data-placeholder="Write your thoughts here..."></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
