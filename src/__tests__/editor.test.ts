@@ -48,9 +48,7 @@ describe("editor utilities", () => {
   });
 
   test("initEditor wires paste handler that sanitizes clipboard text", () => {
-    const execCommandSpy = jest
-      .spyOn(document, "execCommand")
-      .mockImplementation(() => true);
+    const execCommandSpy = jest.spyOn(document, "execCommand").mockImplementation(() => true);
 
     editorModule.initEditor();
 

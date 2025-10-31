@@ -1,11 +1,4 @@
-import {
-  ChromnotesState,
-  Note,
-  STORAGE_FALLBACK_KEY,
-  defaultState,
-  Theme,
-  THEMES
-} from "./types";
+import { ChromnotesState, Note, STORAGE_FALLBACK_KEY, defaultState, Theme, THEMES } from "./types";
 
 let state: ChromnotesState = { ...defaultState };
 
@@ -19,7 +12,7 @@ const supportsChromeSync =
   Boolean(chrome.storage?.sync?.get) &&
   Boolean(chrome.storage?.sync?.set);
 
-let activeChromeStorage: "sync" | "local" = supportsChromeSync ? "sync" : "local";
+let _activeChromeStorage: "sync" | "local" = supportsChromeSync ? "sync" : "local";
 
 const THEME_SET = new Set<Theme>(THEMES);
 
@@ -122,10 +115,7 @@ function normalizeState(partial?: Partial<ChromnotesState>): ChromnotesState {
     notes: sanitizedNotes,
     categoryIndex: buildCategoryIndex(sanitizedNotes),
     theme: coerceTheme(partial?.theme),
-    selectedNoteId:
-      typeof partial?.selectedNoteId === "string"
-        ? partial.selectedNoteId
-        : null,
+    selectedNoteId: typeof partial?.selectedNoteId === "string" ? partial.selectedNoteId : null,
     notesPerPage,
     currentPage: clampPage(partial?.currentPage ?? defaultState.currentPage, totalPages),
     compactView: Boolean(partial?.compactView),
@@ -177,10 +167,7 @@ async function readFromChromeStorage(
         }
       );
     } catch (error) {
-      console.warn(
-        `Chromnotes: chrome.storage.${mode} unavailable.`,
-        error
-      );
+      console.warn(`Chromnotes: chrome.storage.${mode} unavailable.`, error);
       resolve(null);
     }
   });
@@ -199,20 +186,14 @@ async function writeToChromeStorage(
     try {
       area.set(payload, () => {
         if (chrome.runtime?.lastError) {
-          console.warn(
-            `Chromnotes: chrome.storage.${mode}.set failed.`,
-            chrome.runtime.lastError
-          );
+          console.warn(`Chromnotes: chrome.storage.${mode}.set failed.`, chrome.runtime.lastError);
           resolve(false);
           return;
         }
         resolve(true);
       });
     } catch (error) {
-      console.warn(
-        `Chromnotes: chrome.storage.${mode} unavailable.`,
-        error
-      );
+      console.warn(`Chromnotes: chrome.storage.${mode} unavailable.`, error);
       resolve(false);
     }
   });
@@ -222,9 +203,7 @@ export function getState(): ChromnotesState {
   return state;
 }
 
-export function updateState(
-  partial: Partial<ChromnotesState>
-): ChromnotesState {
+export function updateState(partial: Partial<ChromnotesState>): ChromnotesState {
   const merged: ChromnotesState = {
     ...state,
     ...partial
@@ -244,8 +223,7 @@ export function updateState(
   const desiredPage = partial.currentPage ?? merged.currentPage ?? state.currentPage;
   merged.currentPage = clampPage(desiredPage, totalPages);
 
-  merged.selectedNoteId =
-    typeof merged.selectedNoteId === "string" ? merged.selectedNoteId : null;
+  merged.selectedNoteId = typeof merged.selectedNoteId === "string" ? merged.selectedNoteId : null;
   merged.compactView =
     typeof partial.compactView === "boolean" ? partial.compactView : state.compactView;
   merged.useChromeSync = supportsChromeSync
@@ -254,7 +232,7 @@ export function updateState(
       : state.useChromeSync
     : false;
 
-  activeChromeStorage = merged.useChromeSync && supportsChromeSync ? "sync" : "local";
+  _activeChromeStorage = merged.useChromeSync && supportsChromeSync ? "sync" : "local";
   if (!supportsChromeSync) {
     merged.useChromeSync = false;
   }
@@ -262,12 +240,12 @@ export function updateState(
   merged.activeCategory =
     typeof partial.activeCategory === "string"
       ? partial.activeCategory.trim() || null
-      : merged.activeCategory ?? null;
+      : (merged.activeCategory ?? null);
 
   merged.viewMode =
     partial.viewMode === "desktop" || partial.viewMode === "list"
       ? partial.viewMode
-      : merged.viewMode ?? defaultState.viewMode;
+      : (merged.viewMode ?? defaultState.viewMode);
 
   state = merged;
   return state;
@@ -299,7 +277,7 @@ export function resetState(initial?: ChromnotesState): ChromnotesState {
         ? initial.viewMode
         : defaultState.viewMode
   };
-  activeChromeStorage = state.useChromeSync && supportsChromeSync ? "sync" : "local";
+  _activeChromeStorage = state.useChromeSync && supportsChromeSync ? "sync" : "local";
 
   return state;
 }
@@ -337,7 +315,7 @@ export async function loadState(): Promise<ChromnotesState> {
       notes: [...normalized.notes],
       categoryIndex: buildCategoryIndex(normalized.notes)
     };
-    activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
+    _activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
     return state;
   }
 
@@ -355,7 +333,7 @@ export async function loadState(): Promise<ChromnotesState> {
       notes: [...normalized.notes],
       categoryIndex: buildCategoryIndex(normalized.notes)
     };
-    activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
+    _activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
     return state;
   } catch (error) {
     console.warn("Chromnotes: failed to parse local storage payload.", error);
@@ -363,16 +341,14 @@ export async function loadState(): Promise<ChromnotesState> {
   }
 }
 
-export async function persistState(
-  partial: Partial<ChromnotesState>
-): Promise<ChromnotesState> {
+export async function persistState(partial: Partial<ChromnotesState>): Promise<ChromnotesState> {
   let next = updateState(partial);
   let preferredWritten = false;
 
   if (next.useChromeSync && supportsChromeSync) {
     preferredWritten = await writeToChromeStorage("sync", next);
     if (preferredWritten) {
-      activeChromeStorage = "sync";
+      _activeChromeStorage = "sync";
       if (supportsChromeLocal) {
         await writeToChromeStorage("local", next);
       }
@@ -384,7 +360,7 @@ export async function persistState(
 
   if (!preferredWritten) {
     await writeToChromeStorage("local", next);
-    activeChromeStorage = "local";
+    _activeChromeStorage = "local";
   }
 
   localStorage.setItem(STORAGE_FALLBACK_KEY, JSON.stringify(getState()));

@@ -40,10 +40,7 @@ describe("Chromnotes app", () => {
   });
 
   it("shows the New note button", () => {
-    cy.get("#newNoteButton")
-      .should("exist")
-      .and("be.visible")
-      .and("contain.text", "New note");
+    cy.get("#newNoteButton").should("exist").and("be.visible").and("contain.text", "New note");
   });
 
   it("creates a new note and displays it in the list", () => {
@@ -91,10 +88,7 @@ describe("Chromnotes app", () => {
     cy.get("#modalBackdrop").should("have.class", "hidden");
     cy.contains(".note-card", noteTitle).should("not.exist");
     cy.get("#notesContainer .note-card").should("have.length", 0);
-    cy.get("#emptyState")
-      .should("be.visible")
-      .invoke("text")
-      .should("contain", "No notes yet");
+    cy.get("#emptyState").should("be.visible").invoke("text").should("contain", "No notes yet");
   });
 
   it("paginates when more than 10 notes are created", () => {

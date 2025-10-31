@@ -18,7 +18,9 @@ body {
   margin: 0;
   background: var(--app-bg);
   color: var(--text-primary);
-  transition: background 0.25s ease, color 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 body[data-theme="light"] {
@@ -236,7 +238,10 @@ body[data-theme="girly-girl"] {
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  transition: background 0.2s ease, border 0.2s ease, transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    border 0.2s ease,
+    transform 0.1s ease;
 }
 
 .ghost-button:hover {
@@ -276,7 +281,10 @@ body[data-theme="girly-girl"] {
   color: rgba(17, 24, 39, 0.92);
   border: 1px solid rgba(250, 204, 21, 0.65);
   box-shadow: 0 6px 18px rgba(251, 191, 36, 0.22);
-  transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
 }
 
 .donate-button:hover {
@@ -465,7 +473,10 @@ body[data-layout="desktop"] #notesContainer {
   border: 1px solid transparent;
   background: var(--surface-elevated);
   cursor: pointer;
-  transition: border 0.2s ease, transform 0.1s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    transform 0.1s ease,
+    background 0.2s ease;
 }
 
 .note-card:hover {
@@ -820,7 +831,9 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
   border-radius: 12px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
 }
 
 .theme-option:hover {
@@ -978,7 +991,9 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
   border: 1px solid var(--border);
   background: var(--surface-elevated);
   cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
 }
 
 .layout-option:hover {
@@ -1009,7 +1024,9 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
   border: 1px solid transparent;
   background: var(--surface-elevated);
   cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
 }
 
 .toggle-row.hidden {

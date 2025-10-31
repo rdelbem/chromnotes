@@ -42,11 +42,7 @@ import {
   updateState
 } from "./state";
 import { Note, Theme, STORAGE_FALLBACK_KEY } from "./types";
-import {
-  populateForm,
-  renderNotesList,
-  restoreFormToState
-} from "./view";
+import { populateForm, renderNotesList, restoreFormToState } from "./view";
 
 let settingsOpen = false;
 const chromeSyncAvailable = isChromeSyncAvailable();
@@ -131,7 +127,6 @@ function applyCompactView(
   if (syncState) {
     updateState({ compactView: compact });
   }
-  const theme = getState().theme;
   document.body.classList.toggle("compact-list", compact);
   refreshSettingsControls();
   if (refresh) {
@@ -139,7 +134,10 @@ function applyCompactView(
   }
 }
 
-async function applySyncPreference(syncEnabled: boolean, options: { persist?: boolean } = {}): Promise<void> {
+async function applySyncPreference(
+  syncEnabled: boolean,
+  options: { persist?: boolean } = {}
+): Promise<void> {
   const { persist = true } = options;
   if (!chromeSyncAvailable && syncEnabled) {
     console.warn("Chromnotes: Chrome sync not available in this environment.");
@@ -354,8 +352,8 @@ async function saveCurrentNote(reason: SaveReason): Promise<boolean> {
   }
 
   const selected = snapshot.id
-    ? nextNotes.find((note) => note.id === snapshot.id) ?? null
-    : nextNotes[nextNotes.length - 1] ?? null;
+    ? (nextNotes.find((note) => note.id === snapshot.id) ?? null)
+    : (nextNotes[nextNotes.length - 1] ?? null);
 
   await persistState({
     notes: nextNotes,
@@ -572,9 +570,7 @@ export async function bootstrap(): Promise<void> {
   refreshNotesList();
 
   if (initialState.selectedNoteId) {
-    const current = initialState.notes.find(
-      (note) => note.id === initialState.selectedNoteId
-    );
+    const current = initialState.notes.find((note) => note.id === initialState.selectedNoteId);
     if (current) {
       populateForm(current);
     } else {

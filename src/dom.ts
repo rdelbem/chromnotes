@@ -20,10 +20,8 @@ export const newNoteButton = requireElement<HTMLButtonElement>("newNoteButton");
 export const deleteButton = requireElement<HTMLButtonElement>("modalDeleteButton");
 export const modalBackdrop = requireElement<HTMLDivElement>("modalBackdrop");
 export const modal = requireElement<HTMLDivElement>("noteModal");
-export const modalCancelButton =
-  requireElement<HTMLButtonElement>("modalCancelButton");
-export const modalMaximizeButton =
-  requireElement<HTMLButtonElement>("modalMaximizeButton");
+export const modalCancelButton = requireElement<HTMLButtonElement>("modalCancelButton");
+export const modalMaximizeButton = requireElement<HTMLButtonElement>("modalMaximizeButton");
 export const settingsButton = requireElement<HTMLButtonElement>("settingsButton");
 export const settingsPanel = requireElement<HTMLDivElement>("settingsPanel");
 export const paginationControls = requireElement<HTMLElement>("paginationControls");

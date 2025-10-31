@@ -1,16 +1,5 @@
-import {
-  STORAGE_FALLBACK_KEY,
-  type ChromnotesState,
-  type Note
-} from "../types";
-import {
-  formatDate,
-  generateId,
-  getState,
-  loadState,
-  persistState,
-  resetState
-} from "../state";
+import { STORAGE_FALLBACK_KEY, type ChromnotesState, type Note } from "../types";
+import { formatDate, generateId, getState, loadState, persistState, resetState } from "../state";
 
 const sampleNote = (): Note => ({
   id: generateId(),
@@ -38,7 +27,11 @@ describe("state utilities", () => {
 
     const current = getState();
     expect(current.notes).toHaveLength(1);
-    expect(current.notes[0]).toMatchObject({ id: note.id, title: note.title, category: note.category });
+    expect(current.notes[0]).toMatchObject({
+      id: note.id,
+      title: note.title,
+      category: note.category
+    });
     expect(current.selectedNoteId).toBe(note.id);
     expect(current.theme).toBe("light");
     expect(current.currentPage).toBe(1);

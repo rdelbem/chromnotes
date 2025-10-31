@@ -171,7 +171,9 @@
               <select id="categoryFilter" aria-label="Filter by category"></select>
             </div>
             <ul id="notesContainer" aria-live="polite"></ul>
-            <p id="emptyState" class="empty-state">No notes yet. Start writing and they will appear here.</p>
+            <p id="emptyState" class="empty-state">
+              No notes yet. Start writing and they will appear here.
+            </p>
             <nav
               id="paginationControls"
               class="pagination hidden"
@@ -185,19 +187,47 @@
           </section>
         </main>
         <div id="modalBackdrop" class="modal-backdrop hidden" role="presentation" hidden>
-          <div id="noteModal" class="modal" role="dialog" aria-modal="true" aria-label="Chromnotes editor">
+          <div
+            id="noteModal"
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Chromnotes editor"
+          >
             <header class="modal-header">
               <div class="modal-header-actions">
-                <button id="modalMaximizeButton" class="ghost-button icon-button" type="button" aria-label="Maximize note editor">
+                <button
+                  id="modalMaximizeButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Maximize note editor"
+                >
                   ⤢
                 </button>
-                <button id="modalDeleteButton" class="ghost-button icon-button danger-icon" type="button" aria-label="Delete note" disabled>
+                <button
+                  id="modalDeleteButton"
+                  class="ghost-button icon-button danger-icon"
+                  type="button"
+                  aria-label="Delete note"
+                  disabled
+                >
                   🗑️
                 </button>
-                <button id="modalCancelButton" class="ghost-button icon-button" type="button" aria-label="Close">
+                <button
+                  id="modalCancelButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Close"
+                >
                   ✕
                 </button>
-                <button id="modalSaveButton" class="ghost-button icon-button" type="submit" aria-label="Save note" form="noteForm">
+                <button
+                  id="modalSaveButton"
+                  class="ghost-button icon-button"
+                  type="submit"
+                  aria-label="Save note"
+                  form="noteForm"
+                >
                   💾
                 </button>
               </div>
@@ -206,15 +236,32 @@
               <input type="hidden" id="noteId" />
               <div class="field">
                 <label for="noteTitle">Title</label>
-                <input id="noteTitle" name="noteTitle" type="text" placeholder="Give your note a title" />
+                <input
+                  id="noteTitle"
+                  name="noteTitle"
+                  type="text"
+                  placeholder="Give your note a title"
+                />
               </div>
               <div class="field">
                 <label for="noteCategory">Category</label>
-                <input id="noteCategory" name="noteCategory" type="text" placeholder="e.g. Planning, Research, Personal" />
+                <input
+                  id="noteCategory"
+                  name="noteCategory"
+                  type="text"
+                  placeholder="e.g. Planning, Research, Personal"
+                />
               </div>
               <div class="field field--grow">
                 <label for="noteContent">Note</label>
-                <div id="noteContent" class="editor" role="textbox" aria-multiline="true" contenteditable="true" data-placeholder="Write your thoughts here..."></div>
+                <div
+                  id="noteContent"
+                  class="editor"
+                  role="textbox"
+                  aria-multiline="true"
+                  contenteditable="true"
+                  data-placeholder="Write your thoughts here..."
+                ></div>
               </div>
             </form>
           </div>

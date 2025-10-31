@@ -26,11 +26,9 @@ export function setActiveNote(id: string | null): void {
   noteIdInput.value = id ?? "";
   deleteButton.disabled = !id;
 
-  notesContainer
-    .querySelectorAll<HTMLLIElement>(".note-card")
-    .forEach((item) => {
-      item.classList.toggle("active", item.dataset.id === id);
-    });
+  notesContainer.querySelectorAll<HTMLLIElement>(".note-card").forEach((item) => {
+    item.classList.toggle("active", item.dataset.id === id);
+  });
 }
 
 export function populateForm(note: Note | null): void {
@@ -49,16 +47,11 @@ export function populateForm(note: Note | null): void {
   }
 }
 
-export function renderNotesList(
-  filter = "",
-  onSelect?: (note: Note) => void
-): void {
+export function renderNotesList(filter = "", onSelect?: (note: Note) => void): void {
   const state = getState();
   notesContainer.classList.toggle("compact", state.compactView);
   const query = filter.trim().toLowerCase();
-  const categories = Object.keys(state.categoryIndex).sort((a, b) =>
-    a.localeCompare(b)
-  );
+  const categories = Object.keys(state.categoryIndex).sort((a, b) => a.localeCompare(b));
 
   if (state.activeCategory && !categories.includes(state.activeCategory)) {
     updateState({ activeCategory: null });
@@ -78,9 +71,7 @@ export function renderNotesList(
   }
 
   const activeCategoryValue = state.activeCategory ?? "";
-  categoryFilter.value = categories.includes(activeCategoryValue)
-    ? activeCategoryValue
-    : "";
+  categoryFilter.value = categories.includes(activeCategoryValue) ? activeCategoryValue : "";
   categoryFilter.disabled = categories.length === 0;
 
   const activeCategory = state.activeCategory ?? null;
@@ -115,11 +106,10 @@ export function renderNotesList(
   }
 
   emptyState.hidden = true;
-  emptyState.textContent =
-    "No notes yet. Start writing and they will appear here.";
+  emptyState.textContent = "No notes yet. Start writing and they will appear here.";
 
   const totalPages = Math.max(1, Math.ceil(notes.length / state.notesPerPage));
-  let currentPage = clampPage(state.currentPage, totalPages);
+  const currentPage = clampPage(state.currentPage, totalPages);
 
   if (currentPage !== state.currentPage) {
     updateState({ currentPage });
@@ -154,9 +144,7 @@ export function renderNotesList(
     preview.className = "note-preview";
     const contentText = note.content;
     preview.textContent = contentText
-      ? `${contentText.slice(0, 140).trim()}${
-          contentText.length > 140 ? "…" : ""
-        }`
+      ? `${contentText.slice(0, 140).trim()}${contentText.length > 140 ? "…" : ""}`
       : "No content";
 
     listItem.append(title);
