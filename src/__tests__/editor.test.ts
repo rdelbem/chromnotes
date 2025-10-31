@@ -48,7 +48,12 @@ describe("editor utilities", () => {
   });
 
   test("initEditor wires paste handler that sanitizes clipboard text", () => {
-    const execCommandSpy = jest.spyOn(document, "execCommand").mockImplementation(() => true);
+    const execCommandSpy = jest.fn();
+    const documentWithCommand = document as Document & {
+      execCommand?: (commandId: string, showUI?: boolean, value?: string) => boolean;
+    };
+    const originalCommand = documentWithCommand.execCommand;
+    documentWithCommand.execCommand = execCommandSpy;
 
     editorModule.initEditor();
 
@@ -59,7 +64,11 @@ describe("editor utilities", () => {
       value: clipboardData
     });
 
-    editorElement.dispatchEvent(pasteEvent);
+    try {
+      editorElement.dispatchEvent(pasteEvent);
+    } finally {
+      documentWithCommand.execCommand = originalCommand ?? undefined;
+    }
 
     expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
     expect(clipboardData.getData).toHaveBeenCalledWith("text/plain");
