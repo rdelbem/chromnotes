@@ -11,7 +11,8 @@ export default tseslint.config(
       "coverage/**",
       "cypress/screenshots/**",
       "cypress/videos/**",
-      "scripts/build-extension.mjs"
+      "scripts/build-extension.mjs",
+      "scripts/post-build.mjs"
     ]
   },
   js.configs.recommended,

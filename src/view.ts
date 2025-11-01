@@ -118,6 +118,8 @@ export function renderNotesList(filter = "", onSelect?: (note: Note) => void): v
   const startIndex = (currentPage - 1) * state.notesPerPage;
   const pageNotes = notes.slice(startIndex, startIndex + state.notesPerPage);
 
+  const showPreview = state.viewMode !== "desktop";
+
   pageNotes.forEach((note) => {
     const listItem = document.createElement("li");
     listItem.className = "note-card";
@@ -140,18 +142,21 @@ export function renderNotesList(filter = "", onSelect?: (note: Note) => void): v
     meta.className = "note-meta";
     meta.textContent = `Updated ${formatDate(note.updatedAt)}`;
 
-    const preview = document.createElement("p");
-    preview.className = "note-preview";
-    const contentText = note.content;
-    preview.textContent = contentText
-      ? `${contentText.slice(0, 140).trim()}${contentText.length > 140 ? "…" : ""}`
-      : "No content";
-
     listItem.append(title);
     if (categoryBadge) {
       listItem.append(categoryBadge);
     }
-    listItem.append(meta, preview);
+    listItem.append(meta);
+
+    if (showPreview) {
+      const preview = document.createElement("p");
+      preview.className = "note-preview";
+      const contentText = note.content;
+      preview.textContent = contentText
+        ? `${contentText.slice(0, 140).trim()}${contentText.length > 140 ? "…" : ""}`
+        : "No content";
+      listItem.append(preview);
+    }
     listItem.addEventListener("click", () => {
       populateForm(note);
       onSelect?.(note);
