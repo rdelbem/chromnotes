@@ -1,36 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-
+import { loadAppMarkup, mockEditor, bootstrapApp } from "../test/test-helpers";
 import { STORAGE_FALLBACK_KEY, defaultState, type ChromnotesState } from "../types";
-
-const htmlPath = path.resolve(__dirname, "../../index.html");
-const cssPath = path.resolve(__dirname, "../styles.css");
-const htmlContent = fs.readFileSync(htmlPath, "utf8");
-const cssContent = fs.readFileSync(cssPath, "utf8");
-
-function loadAppMarkup(): void {
-  document.documentElement.innerHTML = htmlContent;
-  const style = document.createElement("style");
-  style.textContent = cssContent;
-  document.head.appendChild(style);
-}
-
-function mockEditor(): void {
-  jest.doMock("@editorjs/editorjs", () => {
-    return {
-      __esModule: true,
-      default: jest.fn().mockImplementation(() => ({
-        render: jest.fn(() => Promise.resolve()),
-        save: jest.fn(() => Promise.resolve({ blocks: [] }))
-      }))
-    };
-  });
-}
-
-async function bootstrapApp(): Promise<void> {
-  const app = await import("../app");
-  await app.bootstrap();
-}
 
 describe("bootstrap state restoration", () => {
   beforeEach(() => {
