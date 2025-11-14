@@ -5,6 +5,7 @@ describe("editor utilities", () => {
   let editorElement: HTMLDivElement;
   let editorConstructorMock: jest.Mock;
   let renderMock: jest.Mock<Promise<void>, [OutputData]>;
+  let saveMock: jest.Mock<Promise<OutputData>, []>;
   let latestConfig: EditorConfig | null;
   let storedData: OutputData;
 
@@ -21,6 +22,7 @@ describe("editor utilities", () => {
     });
     storedData = { blocks: [] };
     latestConfig = null;
+    saveMock = jest.fn(() => Promise.resolve(storedData));
 
     jest.doMock("../dom", () => ({
       __esModule: true,
@@ -38,7 +40,7 @@ describe("editor utilities", () => {
         }
         return {
           render: renderMock,
-          save: jest.fn(() => Promise.resolve(storedData))
+          save: saveMock
         };
       });
       return { __esModule: true, default: editorConstructorMock };
@@ -111,5 +113,174 @@ describe("editor utilities", () => {
     await flushAsync();
 
     expect(editorModule.getEditorValue()).toBe("First item\nSecond item\n[x] Task A\n[ ] Task B");
+  });
+
+  test("setEditorContent normalizes complex blocks into plain text", () => {
+    const complex: OutputData = {
+      blocks: [
+        { type: "paragraph", data: { text: "Hello&nbsp;<b>World</b><br>line" } },
+        {
+          type: "quote",
+          data: { text: "<i>Quote</i>", caption: "<strong>Author</strong>" }
+        },
+        {
+          type: "list",
+          data: { items: ["<span>Item 1</span>", "Item &amp; 2"] }
+        },
+        {
+          type: "checklist",
+          data: {
+            items: [
+              { text: "<b>Task</b> A", checked: true },
+              { text: "Task B", checked: false }
+            ]
+          }
+        },
+        { type: "raw", data: { html: "<div>Raw &lt;html&gt;</div>" } },
+        { type: "simpleImage", data: { caption: "<b>Caption</b>", url: "http://img" } },
+        { type: "image", data: { caption: "Image caption", url: "http://img2" } },
+        { type: "embed", data: { caption: "Embed caption", url: "http://video" } },
+        { type: "unknown" as const, data: {} }
+      ]
+    };
+
+    editorModule.setEditorContent(complex);
+    expect(editorModule.getEditorValue()).toBe(
+      [
+        "Hello World",
+        "line",
+        "Quote — Author",
+        "Item 1",
+        "Item & 2",
+        "[x] Task A",
+        "[ ] Task B",
+        "Raw <html>",
+        "Caption - http://img",
+        "Image caption - http://img2",
+        "Embed caption - http://video"
+      ].join("\n")
+    );
+  });
+
+  test("setEditorContent falls back to plain text when output data is empty", () => {
+    editorModule.setEditorContent({ blocks: [] }, "Hello world");
+    expect(editorModule.getEditorValue()).toBe("Hello world");
+  });
+
+  test("refreshEditorCache warns when editor save fails", async () => {
+    editorModule.initEditor();
+    await flushAsync();
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    saveMock.mockRejectedValueOnce(new Error("Save failed"));
+    await editorModule.refreshEditorCache();
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Chromnotes: failed to sync editor content.",
+      expect.any(Error)
+    );
+    warnSpy.mockRestore();
+  });
+
+  test("setEditorContent handles render failures and continues rendering", async () => {
+    editorModule.initEditor();
+    await flushAsync();
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    renderMock.mockRejectedValueOnce(new Error("render failed"));
+    editorModule.setEditorContent({
+      blocks: [{ type: "paragraph", data: { text: "First" } }]
+    });
+    await flushAsync();
+    renderMock.mockResolvedValueOnce(Promise.resolve());
+    editorModule.setEditorContent({
+      blocks: [{ type: "paragraph", data: { text: "Second" } }]
+    });
+    await flushAsync();
+    expect(renderMock).toHaveBeenCalledTimes(2);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Chromnotes: failed to render editor content.",
+      expect.any(Error)
+    );
+    warnSpy.mockRestore();
+  });
+
+  test("buildToolsConfig uploader resolves and rejects correctly", async () => {
+    editorModule.initEditor();
+    await flushAsync();
+    const tools = latestConfig?.tools;
+    const uploader = (
+      tools?.image as {
+        config: { uploader: { uploadByFile: (file: File) => Promise<unknown> } };
+      }
+    )?.config.uploader;
+    if (!uploader) {
+      throw new Error("Uploader config missing");
+    }
+
+    const originalFileReader = global.FileReader;
+    type MockFileReaderCtor = new () => Partial<FileReader> & {
+      result: string | ArrayBuffer | null;
+      onload: null | (() => void);
+      onerror: null | (() => void);
+      readAsDataURL: () => void;
+      error?: Error | null;
+    };
+    const globalWithFileReader = globalThis as typeof globalThis & {
+      FileReader: typeof FileReader;
+    };
+    const setMockFileReader = (ctor: MockFileReaderCtor): void => {
+      globalWithFileReader.FileReader = ctor as unknown as typeof FileReader;
+    };
+
+    class SuccessfulFileReader {
+      public result: string | ArrayBuffer | null = null;
+      public onload: null | (() => void) = null;
+      public onerror: null | (() => void) = null;
+      readAsDataURL(): void {
+        this.result = "data:image/png;base64,AAAA";
+        this.onload?.();
+      }
+    }
+
+    setMockFileReader(SuccessfulFileReader);
+
+    const file = {
+      name: "photo.png",
+      type: "image/png",
+      arrayBuffer: () => Promise.resolve(new Uint8Array([1]).buffer)
+    } as unknown as File;
+
+    const success = await uploader.uploadByFile(file);
+    expect(success).toEqual({
+      success: 1,
+      file: { url: "data:image/png;base64,AAAA", name: "photo.png" }
+    });
+
+    class FailingFileReader {
+      public result: string | ArrayBuffer | null = null;
+      public error: Error | null = null;
+      public onload: null | (() => void) = null;
+      public onerror: null | (() => void) = null;
+      readAsDataURL(): void {
+        this.error = new Error("reader error");
+        this.onerror?.();
+      }
+    }
+    setMockFileReader(FailingFileReader);
+
+    await expect(uploader.uploadByFile(file)).rejects.toEqual(new Error("reader error"));
+
+    class EmptyFileReader {
+      public result: string | ArrayBuffer | null = null;
+      public onload: null | (() => void) = null;
+      public onerror: null | (() => void) = null;
+      readAsDataURL(): void {
+        this.result = "";
+        this.onload?.();
+      }
+    }
+    setMockFileReader(EmptyFileReader);
+
+    await expect(uploader.uploadByFile(file)).rejects.toThrow("Unable to generate image preview.");
+
+    globalWithFileReader.FileReader = originalFileReader;
   });
 });
