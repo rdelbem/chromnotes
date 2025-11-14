@@ -1,6 +1,6 @@
 # Chromnotes
 [![Tests](https://github.com/rodrigodelbem/chromnotes/actions/workflows/ci.yml/badge.svg)](https://github.com/rodrigodelbem/chromnotes/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/coverage-66%25-yellowgreen)
+![Coverage](https://img.shields.io/badge/coverage-75%25-yellowgreen)
 
 Chromnotes turns every new browser tab into a focused note-taking surface. It pairs a rich block editor with fast search, tagging, theming so you can capture ideas the moment the tab opens.
 
