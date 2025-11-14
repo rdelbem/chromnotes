@@ -1,17 +1,48 @@
+import type { API, BlockMutationEvent, EditorConfig, OutputData } from "@editorjs/editorjs";
+
 describe("editor utilities", () => {
   let editorModule: typeof import("../editor");
   let editorElement: HTMLDivElement;
+  let editorConstructorMock: jest.Mock;
+  let renderMock: jest.Mock<Promise<void>, [OutputData]>;
+  let latestConfig: EditorConfig | null;
+  let storedData: OutputData;
+
+  const flushAsync = () => new Promise((resolve) => setTimeout(resolve, 0));
 
   const setupModule = async (): Promise<void> => {
     jest.resetModules();
     editorElement = document.createElement("div");
-    editorElement.innerHTML = "";
-    editorElement.innerText = "";
+    editorElement.dataset.placeholder = "Write something";
+
+    renderMock = jest.fn<Promise<void>, [OutputData]>((data) => {
+      storedData = data;
+      return Promise.resolve();
+    });
+    storedData = { blocks: [] };
+    latestConfig = null;
 
     jest.doMock("../dom", () => ({
       __esModule: true,
       contentEditor: editorElement
     }));
+
+    jest.doMock("@editorjs/editorjs", () => {
+      editorConstructorMock = jest.fn((config: EditorConfig) => {
+        latestConfig = config;
+        if (config.data) {
+          storedData = config.data;
+        }
+        if (typeof config.onReady === "function") {
+          config.onReady();
+        }
+        return {
+          render: renderMock,
+          save: jest.fn(() => Promise.resolve(storedData))
+        };
+      });
+      return { __esModule: true, default: editorConstructorMock };
+    });
 
     editorModule = await import("../editor");
   };
@@ -24,68 +55,61 @@ describe("editor utilities", () => {
     jest.restoreAllMocks();
   });
 
-  test("getEditorValue normalizes whitespace and preserves newlines", () => {
-    editorElement.innerText = "Hello\r\nWorld  ";
-    const value = editorModule.getEditorValue();
-    expect(value).toBe("Hello\nWorld");
+  test("setEditorValue normalizes newline characters", () => {
+    editorModule.setEditorValue("Hello\r\nWorld  ");
+    expect(editorModule.getEditorValue()).toBe("Hello\nWorld");
   });
 
-  test("getEditorValue clears placeholder when empty", () => {
-    editorElement.innerText = "\u00a0  ";
-    editorElement.innerHTML = "<p><br></p>";
-    const value = editorModule.getEditorValue();
-    expect(value).toBe("");
-    expect(editorElement.innerHTML).toBe("");
+  test("initEditor bootstraps Editor.js with cached content", () => {
+    editorModule.setEditorValue("Persistent text");
+    editorModule.initEditor();
+
+    expect(editorConstructorMock).toHaveBeenCalledTimes(1);
+    const config = editorConstructorMock.mock.calls[0][0] as EditorConfig;
+    expect(config.holder).toBe(editorElement);
+    expect(config.placeholder).toBe("Write something");
+    expect(config.data?.blocks?.[0]?.data?.text).toContain("Persistent text");
+    expect(Object.keys(config.tools ?? {})).toEqual(
+      expect.arrayContaining(["embed", "raw", "checklist", "list", "quote", "simpleImage", "image"])
+    );
   });
 
-  test("setEditorValue normalizes input and clears placeholder", () => {
-    editorElement.innerHTML = "<span>should clear</span>";
-    editorModule.setEditorValue("Line one\r\nLine two");
-    expect(editorElement.innerText).toBe("Line one\nLine two");
+  test("setEditorValue renders content once editor is ready", async () => {
+    editorModule.initEditor();
+    renderMock.mockClear();
 
-    editorModule.setEditorValue("");
-    expect(editorElement.innerHTML).toBe("");
+    editorModule.setEditorValue("Updated content");
+    await flushAsync();
+
+    expect(renderMock).toHaveBeenCalledTimes(1);
+    const renderArg = renderMock.mock.calls[0][0];
+    expect(renderArg.blocks[0].data.text).toContain("Updated content");
   });
 
-  test("initEditor wires paste handler that sanitizes clipboard text", () => {
-    const execCommandSpy = jest.fn();
-    const documentWithCommand = document as Document & {
-      execCommand?: (commandId: string, showUI?: boolean, value?: string) => boolean;
+  test("editor change updates cached plain text", async () => {
+    editorModule.initEditor();
+    storedData = {
+      blocks: [
+        { type: "list", data: { items: ["<b>First item</b>", "Second item"] } },
+        {
+          type: "checklist",
+          data: {
+            items: [
+              { text: "Task A", checked: true },
+              { text: "Task B", checked: false }
+            ]
+          }
+        }
+      ]
     };
-    const originalCommand = documentWithCommand.execCommand;
-    documentWithCommand.execCommand = execCommandSpy;
 
-    editorModule.initEditor();
+    const onChange = latestConfig?.onChange as
+      | ((api: API, event: BlockMutationEvent | BlockMutationEvent[]) => void)
+      | undefined;
+    const saver = { save: jest.fn(() => Promise.resolve(storedData)) };
+    onChange?.({ saver } as unknown as API, [] as BlockMutationEvent[]);
+    await flushAsync();
 
-    const clipboardData = { getData: jest.fn(() => "pasted text") };
-    const pasteEvent = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent;
-    const preventDefaultSpy = jest.spyOn(pasteEvent, "preventDefault");
-    Object.defineProperty(pasteEvent, "clipboardData", {
-      value: clipboardData
-    });
-
-    try {
-      editorElement.dispatchEvent(pasteEvent);
-    } finally {
-      documentWithCommand.execCommand = originalCommand ?? undefined;
-    }
-
-    expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
-    expect(clipboardData.getData).toHaveBeenCalledWith("text/plain");
-    expect(execCommandSpy).toHaveBeenCalledWith("insertText", false, "pasted text");
-  });
-
-  test("initEditor clears placeholder on input and blur", () => {
-    editorElement.innerHTML = "<em>ignore</em>";
-    editorModule.initEditor();
-
-    editorElement.innerText = "   ";
-    editorElement.dispatchEvent(new Event("input"));
-    expect(editorElement.innerHTML).toBe("");
-
-    editorElement.innerHTML = "<em>ignore</em>";
-    editorElement.innerText = "\u00a0";
-    editorElement.dispatchEvent(new Event("blur"));
-    expect(editorElement.innerHTML).toBe("");
+    expect(editorModule.getEditorValue()).toBe("First item\nSecond item\n[x] Task A\n[ ] Task B");
   });
 });

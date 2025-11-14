@@ -1,3 +1,5 @@
+import type { OutputData } from "@editorjs/editorjs";
+
 export const THEMES = [
   "light",
   "dark",
@@ -12,10 +14,13 @@ export const THEMES = [
 
 export type Theme = (typeof THEMES)[number];
 
+export type SerializedEditorData = OutputData;
+
 export type Note = {
   id: string;
   title: string;
   content: string;
+  contentRaw: SerializedEditorData | null;
   createdAt: number;
   updatedAt: number;
   category: string;

@@ -12,7 +12,7 @@ import {
   nextPageButton,
   titleInput
 } from "./dom";
-import { setEditorValue } from "./editor";
+import { setEditorContent } from "./editor";
 import { formatDate, getState, updateState } from "./state";
 import { Note } from "./types";
 
@@ -36,13 +36,13 @@ export function populateForm(note: Note | null): void {
     noteIdInput.value = note.id;
     titleInput.value = note.title;
     categoryInput.value = note.category;
-    setEditorValue(note.content);
+    setEditorContent(note.contentRaw, note.content);
     setActiveNote(note.id);
   } else {
     form.reset();
     noteIdInput.value = "";
     categoryInput.value = "";
-    setEditorValue("");
+    setEditorContent(null, "");
     setActiveNote(null);
   }
 }

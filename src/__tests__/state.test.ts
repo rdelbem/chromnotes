@@ -5,6 +5,14 @@ const sampleNote = (): Note => ({
   id: generateId(),
   title: "Focus",
   content: "Ship Chromnotes",
+  contentRaw: {
+    blocks: [
+      {
+        type: "paragraph",
+        data: { text: "Ship Chromnotes" }
+      }
+    ]
+  },
   createdAt: Date.now(),
   updatedAt: Date.now(),
   category: "General"
@@ -32,6 +40,7 @@ describe("state utilities", () => {
       title: note.title,
       category: note.category
     });
+    expect(current.notes[0].contentRaw?.blocks).toHaveLength(1);
     expect(current.selectedNoteId).toBe(note.id);
     expect(current.theme).toBe("light");
     expect(current.currentPage).toBe(1);
@@ -73,6 +82,7 @@ describe("state utilities", () => {
     expect(loaded.activeCategory).toBe("General");
     expect(loaded.viewMode).toBe("desktop");
     expect(loaded.categoryIndex.General).toEqual([note.id]);
+    expect(loaded.notes[0].contentRaw?.blocks).toHaveLength(1);
   });
 
   test("generateId produces unique identifiers", () => {

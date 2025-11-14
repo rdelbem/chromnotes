@@ -1,4 +1,12 @@
-import { ChromnotesState, Note, STORAGE_FALLBACK_KEY, defaultState, Theme, THEMES } from "./types";
+import {
+  ChromnotesState,
+  Note,
+  SerializedEditorData,
+  STORAGE_FALLBACK_KEY,
+  defaultState,
+  Theme,
+  THEMES
+} from "./types";
 
 let state: ChromnotesState = { ...defaultState };
 
@@ -15,6 +23,35 @@ const supportsChromeSync =
 let _activeChromeStorage: "sync" | "local" = supportsChromeSync ? "sync" : "local";
 
 const THEME_SET = new Set<Theme>(THEMES);
+
+function sanitizeEditorData(data: unknown): SerializedEditorData | null {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+  const record = data as { blocks?: unknown; time?: unknown; version?: unknown };
+  if (!Array.isArray(record.blocks)) {
+    return null;
+  }
+  const validBlocks = record.blocks.filter((block) => {
+    if (!block || typeof block !== "object") {
+      return false;
+    }
+    const entry = block as { type?: unknown; data?: unknown };
+    return typeof entry.type === "string" && (!entry.data || typeof entry.data === "object");
+  });
+
+  if (!validBlocks.length) {
+    return null;
+  }
+
+  const normalized = {
+    blocks: validBlocks,
+    time: typeof record.time === "number" ? record.time : undefined,
+    version: typeof record.version === "string" ? record.version : undefined
+  };
+
+  return JSON.parse(JSON.stringify(normalized)) as SerializedEditorData;
+}
 
 function sanitizeNotes(notes: unknown): Note[] {
   if (!Array.isArray(notes)) {
@@ -35,6 +72,7 @@ function sanitizeNotes(notes: unknown): Note[] {
         id: candidate.id,
         title: typeof candidate.title === "string" ? candidate.title : "",
         content: typeof candidate.content === "string" ? candidate.content : "",
+        contentRaw: sanitizeEditorData((candidate as { contentRaw?: unknown }).contentRaw),
         createdAt: candidate.createdAt,
         updatedAt: candidate.updatedAt,
         category:
@@ -44,6 +82,10 @@ function sanitizeNotes(notes: unknown): Note[] {
       };
     })
     .filter((note): note is Note => note !== null);
+}
+
+export function normalizeNotesPayload(payload: unknown): Note[] {
+  return sanitizeNotes(payload);
 }
 
 function buildCategoryIndex(notes: Note[]): Record<string, string[]> {

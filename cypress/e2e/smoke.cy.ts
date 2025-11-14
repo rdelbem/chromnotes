@@ -18,7 +18,11 @@ describe("Chromnotes app", () => {
     cy.get("#modalBackdrop").should("not.have.class", "hidden");
     cy.get("#noteTitle").clear().type(title);
     cy.get("#noteCategory").clear().type(category);
-    cy.get("#noteContent").click().type(content);
+    cy.get("#noteContent .ce-paragraph", { timeout: 5000 })
+      .first()
+      .click()
+      .type("{selectall}{backspace}")
+      .type(content, { delay: 0 });
 
     cy.get("#modalSaveButton").click();
     cy.get("#modalBackdrop").should("not.have.class", "hidden");
@@ -33,6 +37,12 @@ describe("Chromnotes app", () => {
       }
     });
     cy.get("#settingsPanel").should("not.have.class", "hidden").and("be.visible");
+  };
+
+  const openSettingsTab = (tab: "appearance" | "layout" | "data") => {
+    openSettings();
+    cy.get(`[data-settings-tab="${tab}"]`).click();
+    cy.get(`[data-settings-panel="${tab}"]`).should("have.class", "is-active").and("be.visible");
   };
 
   beforeEach(() => {
@@ -199,5 +209,70 @@ describe("Chromnotes app", () => {
 
     cy.get("#modalCancelButton").click();
     cy.get("#modalBackdrop").should("have.class", "hidden");
+  });
+
+  it("exports notes via the settings data tab", () => {
+    const noteTitle = `Exportable ${Date.now()}`;
+    createNote(noteTitle, "Content for export", "Data");
+
+    openSettingsTab("data");
+
+    cy.window().then((win) => {
+      cy.stub(win.URL, "createObjectURL")
+        .as("createObjectURL")
+        .callsFake((blob: Blob) => {
+          void blob.text().then((text) => {
+            expect(text).to.include(noteTitle);
+          });
+          return "blob:stubbed";
+        });
+      cy.stub(win.URL, "revokeObjectURL").as("revokeObjectURL");
+    });
+
+    cy.get("#exportNotesButton").click();
+
+    cy.get("@createObjectURL").should("have.been.calledOnce");
+    cy.get("@revokeObjectURL").should("have.been.calledOnceWith", "blob:stubbed");
+    cy.get("#settingsPanel").should("not.have.class", "hidden");
+    cy.get("#settingsOverlay")
+      .should("not.have.class", "hidden")
+      .and("have.attr", "role", "presentation");
+  });
+
+  it("imports notes via the settings data tab", () => {
+    openSettingsTab("data");
+
+    const timestamp = Date.now();
+    const importPayload = JSON.stringify(
+      [
+        {
+          id: `import-${timestamp}`,
+          title: "Imported Cypress Note",
+          content: "This note came from a file.",
+          contentRaw: null,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          category: "Imports"
+        }
+      ],
+      null,
+      2
+    );
+
+    cy.get("#importNotesInput").selectFile(
+      {
+        contents: Cypress.Buffer.from(importPayload),
+        fileName: "chromnotes-notes.txt",
+        mimeType: "text/plain",
+        lastModified: timestamp
+      },
+      { force: true }
+    );
+
+    cy.get("#importNotesStatus").should("contain.text", "Imported 1 note");
+    cy.contains(".note-card", "Imported Cypress Note").should("exist").and("be.visible");
+    cy.contains(".note-card", "Imported Cypress Note")
+      .find(".note-category")
+      .should("contain.text", "Imports");
   });
 });

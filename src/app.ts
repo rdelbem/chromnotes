@@ -11,6 +11,10 @@ import {
   nextPageButton,
   settingsButton,
   settingsPanel,
+  settingsCloseButton,
+  settingsOverlay,
+  settingsTabButtons,
+  settingsTabPanels,
   prevPageButton,
   categoryInput,
   categoryFilter,
@@ -21,9 +25,12 @@ import {
   themeToggle,
   titleInput,
   contentEditor,
+  exportNotesButton,
+  importNotesInput,
+  importNotesStatus,
   modalSaveButton
 } from "./dom";
-import { getEditorValue, initEditor } from "./editor";
+import { getEditorData, getEditorValue, refreshEditorCache, initEditor } from "./editor";
 import {
   applyModalSize,
   closeModal,
@@ -39,7 +46,8 @@ import {
   isChromeSyncAvailable,
   loadState,
   persistState,
-  updateState
+  updateState,
+  normalizeNotesPayload
 } from "./state";
 import { Note, Theme, STORAGE_FALLBACK_KEY } from "./types";
 import { populateForm, renderNotesList, restoreFormToState } from "./view";
@@ -52,6 +60,9 @@ const AUTO_SAVE_GLOW_DURATION_MS = 2_000;
 let autoSaveGlowTimer: number | null = null;
 const AUTO_SAVE_GLOW_CLASS = "modal-save-button--autosaved";
 const LIGHT_THEME_SET = new Set<Theme>(["light", "dawn", "paper", "girly-girl"]);
+const DEFAULT_SETTINGS_TAB = settingsTabButtons[0]?.dataset.settingsTab ?? "appearance";
+let activeSettingsTab = DEFAULT_SETTINGS_TAB;
+let importStatusTimer: number | null = null;
 
 function isLightTheme(theme: Theme): boolean {
   return LIGHT_THEME_SET.has(theme);
@@ -75,7 +86,6 @@ function refreshNotesList(): void {
 
 function handleNoteSelection(note: Note): void {
   void persistState({ selectedNoteId: note.id });
-  closeSettingsPanel();
   openModal("edit");
   resetAutoSaveState();
 }
@@ -93,6 +103,41 @@ function refreshSettingsControls(): void {
     input.checked = input.value === state.viewMode;
   });
 }
+
+function setActiveSettingsTab(tabId: string, options: { focus?: boolean } = {}): void {
+  const { focus = false } = options;
+  if (!settingsTabButtons.length || !settingsTabPanels.length) {
+    return;
+  }
+
+  const availableTabs = new Set(settingsTabButtons.map((button) => button.dataset.settingsTab));
+  const normalized = availableTabs.has(tabId) ? tabId : DEFAULT_SETTINGS_TAB;
+  activeSettingsTab = normalized ?? DEFAULT_SETTINGS_TAB;
+
+  settingsTabButtons.forEach((button) => {
+    const id = button.dataset.settingsTab;
+    const isActive = id === activeSettingsTab;
+    button.classList.toggle("settings-tab--active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+    button.tabIndex = isActive ? 0 : -1;
+    if (isActive && focus) {
+      button.focus();
+    }
+  });
+
+  settingsTabPanels.forEach((panel) => {
+    const id = panel.dataset.settingsPanel;
+    const isActive = id === activeSettingsTab;
+    panel.classList.toggle("is-active", isActive);
+    if (isActive) {
+      panel.removeAttribute("hidden");
+    } else {
+      panel.setAttribute("hidden", "");
+    }
+  });
+}
+
+setActiveSettingsTab(activeSettingsTab);
 
 function updateModalControls(viewMode: "list" | "desktop"): void {
   const isDesktopView = viewMode === "desktop";
@@ -196,6 +241,10 @@ function openSettingsPanel(): void {
   settingsPanel.classList.remove("hidden");
   settingsPanel.removeAttribute("hidden");
   settingsButton.setAttribute("aria-expanded", "true");
+  settingsOverlay.classList.remove("hidden");
+  settingsOverlay.removeAttribute("hidden");
+  document.body.classList.add("settings-modal-open");
+  setActiveSettingsTab(activeSettingsTab, { focus: true });
 }
 
 function closeSettingsPanel(): void {
@@ -204,6 +253,10 @@ function closeSettingsPanel(): void {
   settingsPanel.classList.add("hidden");
   settingsPanel.setAttribute("hidden", "");
   settingsButton.setAttribute("aria-expanded", "false");
+  settingsOverlay.classList.add("hidden");
+  settingsOverlay.setAttribute("hidden", "");
+  document.body.classList.remove("settings-modal-open");
+  settingsButton.focus();
 }
 
 function toggleSettingsPanel(): void {
@@ -211,18 +264,6 @@ function toggleSettingsPanel(): void {
     closeSettingsPanel();
   } else {
     openSettingsPanel();
-  }
-}
-
-function handleDocumentClick(event: MouseEvent): void {
-  if (!settingsOpen) return;
-  const target = event.target as Node;
-  if (
-    !settingsPanel.contains(target) &&
-    target !== settingsButton &&
-    !settingsButton.contains(target)
-  ) {
-    closeSettingsPanel();
   }
 }
 
@@ -259,12 +300,14 @@ function getFormSnapshot(): {
   id: string | null;
   title: string;
   content: string;
+  contentRaw: ReturnType<typeof getEditorData>;
   category: string;
 } {
   return {
     id: noteIdInput.value || null,
     title: titleInput.value.trim(),
     content: getEditorValue(),
+    contentRaw: getEditorData(),
     category: categoryInput.value.trim()
   };
 }
@@ -285,7 +328,8 @@ function hasFormChanges(): boolean {
   return (
     existing.title !== snapshot.title ||
     existing.content !== snapshot.content ||
-    existing.category !== snapshot.category
+    existing.category !== snapshot.category ||
+    JSON.stringify(existing.contentRaw ?? null) !== JSON.stringify(snapshot.contentRaw ?? null)
   );
 }
 
@@ -308,6 +352,7 @@ async function triggerAutoSave(): Promise<void> {
 }
 
 async function saveCurrentNote(reason: SaveReason): Promise<boolean> {
+  await refreshEditorCache();
   const snapshot = getFormSnapshot();
   if (reason === "auto" && !snapshot.id) {
     return false;
@@ -332,6 +377,7 @@ async function saveCurrentNote(reason: SaveReason): Promise<boolean> {
             ...note,
             title: snapshot.title,
             content: snapshot.content,
+            contentRaw: snapshot.contentRaw,
             category: snapshot.category,
             updatedAt: timestamp
           }
@@ -344,6 +390,7 @@ async function saveCurrentNote(reason: SaveReason): Promise<boolean> {
         id: generateId(),
         title: snapshot.title,
         content: snapshot.content,
+        contentRaw: snapshot.contentRaw,
         category: snapshot.category,
         createdAt: timestamp,
         updatedAt: timestamp
@@ -422,6 +469,146 @@ async function handleDeleteNote(): Promise<void> {
   resetAutoSaveState();
 }
 
+function pad(value: number): string {
+  return value.toString().padStart(2, "0");
+}
+
+function buildExportFileName(): string {
+  const now = new Date();
+  const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `chromnotes-notes-${date}_${time}.txt`;
+}
+
+function formatNotesForExport(notes: Note[]): string {
+  const serialized = JSON.stringify(notes, null, 2);
+  return serialized.endsWith("\n") ? serialized : `${serialized}\n`;
+}
+
+function validateImportedNotes(data: unknown): Note[] | null {
+  const parsed = normalizeNotesPayload(data);
+  if (!parsed.length) {
+    return null;
+  }
+  return parsed;
+}
+
+async function persistImportedNotes(notes: Note[]): Promise<void> {
+  const existing = getState();
+  const mergedMap = new Map<string, Note>();
+
+  existing.notes.forEach((note) => {
+    mergedMap.set(note.id, note);
+  });
+
+  notes.forEach((note) => {
+    const current = mergedMap.get(note.id);
+    if (!current || note.updatedAt >= current.updatedAt) {
+      mergedMap.set(note.id, note);
+    }
+  });
+
+  const mergedNotes = Array.from(mergedMap.values()).sort((a, b) => a.createdAt - b.createdAt);
+
+  await persistState({
+    notes: mergedNotes,
+    selectedNoteId: mergedNotes.length ? mergedNotes[mergedNotes.length - 1].id : null,
+    currentPage: 1
+  });
+
+  refreshNotesList();
+  const state = getState();
+  if (state.selectedNoteId) {
+    const selectedNote = state.notes.find((note) => note.id === state.selectedNoteId);
+    populateForm(selectedNote ?? null);
+  } else {
+    populateForm(null);
+  }
+}
+
+function createDownloadTarget(content: string): { href: string; cleanup: () => void } {
+  if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const objectUrl = URL.createObjectURL(blob);
+    return {
+      href: objectUrl,
+      cleanup: () => {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }
+
+  const dataUrl = `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`;
+  return {
+    href: dataUrl,
+    cleanup: () => {
+      /* no-op */
+    }
+  };
+}
+
+function handleExportNotes(): void {
+  const notes = getState().notes;
+  const content = formatNotesForExport(notes);
+  const filename = buildExportFileName();
+  const { href, cleanup } = createDownloadTarget(content);
+
+  const anchor = document.createElement("a");
+  anchor.href = href;
+  anchor.download = filename;
+  anchor.rel = "noopener";
+  anchor.style.position = "absolute";
+  anchor.style.left = "-9999px";
+
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  const finalize = (): void => {
+    anchor.remove();
+    cleanup();
+  };
+
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(finalize);
+  } else {
+    window.setTimeout(finalize, 0);
+  }
+}
+
+async function handleImportNotes(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0] ?? null;
+  if (!file) {
+    return;
+  }
+
+  if (importStatusTimer !== null) {
+    window.clearTimeout(importStatusTimer);
+    importStatusTimer = null;
+  }
+
+  importNotesStatus.textContent = "Importing…";
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text) as unknown;
+    const notes = validateImportedNotes(parsed);
+    if (!notes) {
+      throw new Error("Chromnotes: invalid notes file.");
+    }
+    await persistImportedNotes(notes);
+    importNotesStatus.textContent = `Imported ${notes.length} note${notes.length === 1 ? "" : "s"}.`;
+  } catch (error) {
+    console.error("Chromnotes: failed to import notes.", error);
+    importNotesStatus.textContent = "Import failed. Please check the file.";
+  } finally {
+    input.value = "";
+    importStatusTimer = window.setTimeout(() => {
+      importNotesStatus.textContent = "";
+      importStatusTimer = null;
+    }, 5000);
+  }
+}
+
 function bindEventListeners(): void {
   form.addEventListener("submit", (event) => {
     void handleFormSubmit(event);
@@ -487,7 +674,6 @@ function bindEventListeners(): void {
       const selectedTheme = input.value as Theme;
       applyTheme(selectedTheme);
       void persistState({ theme: selectedTheme });
-      closeSettingsPanel();
     });
   });
 
@@ -502,7 +688,6 @@ function bindEventListeners(): void {
       if (!input.checked) return;
       const mode = input.value === "desktop" ? "desktop" : "list";
       void applyViewMode(mode);
-      closeSettingsPanel();
     });
   });
 
@@ -531,6 +716,47 @@ function bindEventListeners(): void {
     event.stopPropagation();
   });
 
+  settingsTabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const tabId = button.dataset.settingsTab;
+      if (!tabId) return;
+      setActiveSettingsTab(tabId, { focus: true });
+    });
+
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) {
+        return;
+      }
+      event.preventDefault();
+      const currentIndex = settingsTabButtons.findIndex((candidate) => candidate === button);
+      if (currentIndex === -1) {
+        return;
+      }
+      const offset = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex =
+        (currentIndex + offset + settingsTabButtons.length) % settingsTabButtons.length;
+      const nextButton = settingsTabButtons[nextIndex];
+      const tabId = nextButton?.dataset.settingsTab;
+      if (!tabId) {
+        return;
+      }
+      setActiveSettingsTab(tabId, { focus: true });
+    });
+  });
+
+  settingsCloseButton.addEventListener("click", () => {
+    closeSettingsPanel();
+  });
+
+  settingsOverlay.addEventListener("click", () => {
+    closeSettingsPanel();
+  });
+
+  exportNotesButton.addEventListener("click", handleExportNotes);
+  importNotesInput.addEventListener("change", (event) => {
+    void handleImportNotes(event);
+  });
+
   prevPageButton.addEventListener("click", () => {
     void goToPage(getState().currentPage - 1);
   });
@@ -550,8 +776,6 @@ function bindEventListeners(): void {
       }
     }
   });
-
-  document.addEventListener("click", handleDocumentClick);
 }
 
 export async function bootstrap(): Promise<void> {

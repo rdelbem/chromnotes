@@ -24,12 +24,28 @@ export const modalCancelButton = requireElement<HTMLButtonElement>("modalCancelB
 export const modalMaximizeButton = requireElement<HTMLButtonElement>("modalMaximizeButton");
 export const settingsButton = requireElement<HTMLButtonElement>("settingsButton");
 export const settingsPanel = requireElement<HTMLDivElement>("settingsPanel");
+export const settingsCloseButton = requireElement<HTMLButtonElement>("settingsCloseButton");
+export const settingsOverlay = requireElement<HTMLDivElement>("settingsOverlay");
+const settingsTabButtonNodeList =
+  document.querySelectorAll<HTMLButtonElement>("[data-settings-tab]");
+if (!settingsTabButtonNodeList.length) {
+  throw new Error("Chromnotes: missing settings tab buttons.");
+}
+export const settingsTabButtons = Array.from(settingsTabButtonNodeList);
+const settingsTabPanelNodeList = document.querySelectorAll<HTMLElement>("[data-settings-panel]");
+if (!settingsTabPanelNodeList.length) {
+  throw new Error("Chromnotes: missing settings tab panels.");
+}
+export const settingsTabPanels = Array.from(settingsTabPanelNodeList);
 export const paginationControls = requireElement<HTMLElement>("paginationControls");
 export const paginationStatus = requireElement<HTMLSpanElement>("paginationStatus");
 export const prevPageButton = requireElement<HTMLButtonElement>("prevPageButton");
 export const nextPageButton = requireElement<HTMLButtonElement>("nextPageButton");
 export const compactToggle = requireElement<HTMLInputElement>("compactToggle");
 export const syncToggle = requireElement<HTMLInputElement>("syncToggle");
+export const exportNotesButton = requireElement<HTMLButtonElement>("exportNotesButton");
+export const importNotesInput = requireElement<HTMLInputElement>("importNotesInput");
+export const importNotesStatus = requireElement<HTMLParagraphElement>("importNotesStatus");
 export const modalDeleteButton = requireElement<HTMLButtonElement>("modalDeleteButton");
 export const modalSaveButton = requireElement<HTMLButtonElement>("modalSaveButton");
 
