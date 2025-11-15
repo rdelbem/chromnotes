@@ -216,18 +216,15 @@ describe("editor utilities", () => {
     }
 
     const originalFileReader = global.FileReader;
-    type MockFileReaderCtor = new () => Partial<FileReader> & {
+    type MockFileReaderCtor = new () => {
       result: string | ArrayBuffer | null;
       onload: null | (() => void);
       onerror: null | (() => void);
       readAsDataURL: () => void;
-      error?: Error | null;
-    };
-    const globalWithFileReader = globalThis as typeof globalThis & {
-      FileReader: typeof FileReader;
+      error?: unknown;
     };
     const setMockFileReader = (ctor: MockFileReaderCtor): void => {
-      globalWithFileReader.FileReader = ctor as unknown as typeof FileReader;
+      (globalThis as unknown as { FileReader: unknown }).FileReader = ctor as unknown;
     };
 
     class SuccessfulFileReader {
@@ -256,7 +253,7 @@ describe("editor utilities", () => {
 
     class FailingFileReader {
       public result: string | ArrayBuffer | null = null;
-      public error: Error | null = null;
+      public error: unknown = null;
       public onload: null | (() => void) = null;
       public onerror: null | (() => void) = null;
       readAsDataURL(): void {
@@ -281,6 +278,6 @@ describe("editor utilities", () => {
 
     await expect(uploader.uploadByFile(file)).rejects.toThrow("Unable to generate image preview.");
 
-    globalWithFileReader.FileReader = originalFileReader;
+    (globalThis as unknown as { FileReader: typeof FileReader }).FileReader = originalFileReader;
   });
 });

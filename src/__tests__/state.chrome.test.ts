@@ -1,11 +1,8 @@
 import { STORAGE_FALLBACK_KEY, type ChromnotesState, type Note } from "../types";
 
-type ChromeSetCallback = () => void;
-type ChromeGetCallback = (items: unknown) => void;
-
 type ChromeStorageAreaMock = {
-  get: jest.Mock<void, [string[] | Record<string, unknown>, ChromeGetCallback]>;
-  set: jest.Mock<void, [Record<string, unknown>, ChromeSetCallback | undefined]>;
+  get: jest.Mock;
+  set: jest.Mock;
 };
 
 type ChromeMock = {
@@ -39,19 +36,19 @@ function installChromeMock(): ChromeMock {
   const sync: ChromeStorageAreaMock = {
     get: jest.fn(),
     set: jest.fn()
-  } as unknown as ChromeStorageAreaMock;
+  };
 
   const local: ChromeStorageAreaMock = {
     get: jest.fn(),
     set: jest.fn()
-  } as unknown as ChromeStorageAreaMock;
+  };
 
   const chromeMock: ChromeMock = {
     storage: { sync, local },
     runtime: { lastError: null }
   };
 
-  (globalThis as typeof globalThis & { chrome?: ChromeMock }).chrome = chromeMock;
+  (globalThis as unknown as { chrome?: unknown }).chrome = chromeMock;
   return chromeMock;
 }
 
@@ -66,7 +63,7 @@ describe("state chrome storage integration", () => {
   });
 
   afterEach(() => {
-    delete (globalThis as { chrome?: ChromeMock }).chrome;
+    delete (globalThis as unknown as { chrome?: ChromeMock }).chrome;
     jest.restoreAllMocks();
     localStorage.clear();
   });
