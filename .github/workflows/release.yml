@@ -32,4 +32,6 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.SEMVER_CHROMENOTES }}
+          HUSKY: 0
+          HUSKY_SKIP_HOOKS: 1
         run: npm run release

@@ -42,7 +42,10 @@ describe("app interactions", () => {
     document.body.innerHTML = "";
     loadAppMarkup();
     localStorage.clear();
-    (globalThis as { chrome?: unknown }).chrome = {
+    const globalWithChrome = globalThis as unknown as {
+      chrome?: unknown;
+    };
+    globalWithChrome.chrome = {
       storage: {},
       runtime: { lastError: null }
     };
@@ -222,7 +225,7 @@ describe("app interactions", () => {
       },
       runtime: { lastError: null }
     };
-    (globalThis as { chrome?: typeof chromeMock }).chrome = chromeMock;
+    (globalThis as unknown as { chrome?: unknown }).chrome = chromeMock;
 
     withSnapshot({});
     mockEditor();
