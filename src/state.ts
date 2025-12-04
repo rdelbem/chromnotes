@@ -1,3 +1,5 @@
+import { createStore } from "zustand/vanilla";
+
 import {
   ChromnotesState,
   Note,
@@ -8,7 +10,12 @@ import {
   THEMES
 } from "./types";
 
-let state: ChromnotesState = { ...defaultState };
+const store = createStore<ChromnotesState>(() => ({ ...defaultState }));
+
+function replaceState(next: ChromnotesState, action: string): ChromnotesState {
+  store.setState(next, true, action);
+  return store.getState();
+}
 
 const supportsChromeLocal =
   typeof chrome !== "undefined" &&
@@ -242,36 +249,37 @@ async function writeToChromeStorage(
 }
 
 export function getState(): ChromnotesState {
-  return state;
+  return store.getState();
 }
 
 export function updateState(partial: Partial<ChromnotesState>): ChromnotesState {
+  const previous = store.getState();
   const merged: ChromnotesState = {
-    ...state,
+    ...previous,
     ...partial
   } as ChromnotesState;
 
   if (isValidTheme(partial.theme)) {
     merged.theme = partial.theme;
   } else if (!isValidTheme(merged.theme)) {
-    merged.theme = state.theme;
+    merged.theme = previous.theme;
   }
 
-  merged.notesPerPage = normalizeNotesPerPage(partial.notesPerPage ?? state.notesPerPage);
+  merged.notesPerPage = normalizeNotesPerPage(partial.notesPerPage ?? previous.notesPerPage);
   merged.notes = partial.notes ? sanitizeNotes(partial.notes) : merged.notes;
   merged.categoryIndex = buildCategoryIndex(merged.notes);
 
   const totalPages = computeTotalPages(merged.notes, merged.notesPerPage);
-  const desiredPage = partial.currentPage ?? merged.currentPage ?? state.currentPage;
+  const desiredPage = partial.currentPage ?? merged.currentPage ?? previous.currentPage;
   merged.currentPage = clampPage(desiredPage, totalPages);
 
   merged.selectedNoteId = typeof merged.selectedNoteId === "string" ? merged.selectedNoteId : null;
   merged.compactView =
-    typeof partial.compactView === "boolean" ? partial.compactView : state.compactView;
+    typeof partial.compactView === "boolean" ? partial.compactView : previous.compactView;
   merged.useChromeSync = supportsChromeSync
     ? typeof partial.useChromeSync === "boolean"
       ? partial.useChromeSync
-      : state.useChromeSync
+      : previous.useChromeSync
     : false;
 
   _activeChromeStorage = merged.useChromeSync && supportsChromeSync ? "sync" : "local";
@@ -289,13 +297,12 @@ export function updateState(partial: Partial<ChromnotesState>): ChromnotesState 
       ? partial.viewMode
       : (merged.viewMode ?? defaultState.viewMode);
 
-  state = merged;
-  return state;
+  return replaceState(merged, "updateState");
 }
 
 export function resetState(initial?: ChromnotesState): ChromnotesState {
   const normalized = normalizeState(initial);
-  state = {
+  const next: ChromnotesState = {
     ...defaultState,
     ...normalized,
     notes: [...normalized.notes],
@@ -319,9 +326,9 @@ export function resetState(initial?: ChromnotesState): ChromnotesState {
         ? initial.viewMode
         : defaultState.viewMode
   };
-  _activeChromeStorage = state.useChromeSync && supportsChromeSync ? "sync" : "local";
+  _activeChromeStorage = next.useChromeSync && supportsChromeSync ? "sync" : "local";
 
-  return state;
+  return replaceState(next, "resetState");
 }
 
 export async function loadState(): Promise<ChromnotesState> {
@@ -351,14 +358,14 @@ export async function loadState(): Promise<ChromnotesState> {
         : modeUsed === "sync";
     const normalized = normalizeState(payload);
     normalized.useChromeSync = payload.useChromeSync ?? (modeUsed === "sync" && supportsChromeSync);
-    state = {
-      ...state,
+    const next = {
+      ...store.getState(),
       ...normalized,
       notes: [...normalized.notes],
       categoryIndex: buildCategoryIndex(normalized.notes)
     };
     _activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
-    return state;
+    return replaceState(next, "loadState");
   }
 
   try {
@@ -369,14 +376,14 @@ export async function loadState(): Promise<ChromnotesState> {
     const parsed = JSON.parse(raw) as Partial<ChromnotesState>;
     const normalized = normalizeState(parsed);
     normalized.useChromeSync = supportsChromeSync && Boolean(parsed.useChromeSync);
-    state = {
-      ...state,
+    const next = {
+      ...store.getState(),
       ...normalized,
       notes: [...normalized.notes],
       categoryIndex: buildCategoryIndex(normalized.notes)
     };
     _activeChromeStorage = normalized.useChromeSync && supportsChromeSync ? "sync" : "local";
-    return state;
+    return replaceState(next, "loadState");
   } catch (error) {
     console.warn("Chromnotes: failed to parse local storage payload.", error);
     return resetState();
@@ -424,7 +431,8 @@ export function formatDate(timestamp: number): string {
 }
 
 export function getTotalPages(): number {
-  return computeTotalPages(state.notes, state.notesPerPage);
+  const current = store.getState();
+  return computeTotalPages(current.notes, current.notesPerPage);
 }
 
 export function setCurrentPage(page: number): ChromnotesState {
