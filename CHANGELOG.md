@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/rdelbem/chromnotes/compare/v1.1.1...v1.1.2) (2025-12-04)
+
+
+### Bug Fixes
+
+* manifest version ([522a82e](https://github.com/rdelbem/chromnotes/commit/522a82e19a05584d1426d68e494c51b5bd88204a))
+
 ## [1.1.1](https://github.com/rdelbem/chromnotes/compare/v1.1.0...v1.1.1) (2025-12-04)
 
 
