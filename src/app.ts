@@ -16,6 +16,7 @@ import {
 } from "./controllers/settings-controller";
 import { registerNotesListRefresher, resetAutoSaveState } from "./controllers/autosave-controller";
 import { parseNotesFromText, persistImportedNotes } from "./services/data-transfer";
+import { initAiController } from "./controllers/ai-controller";
 
 let importStatusTimer: number | null = null;
 
@@ -132,6 +133,25 @@ function bindGlobalStorageListener(): void {
   });
 }
 
+type AiMergeDetail = {
+  noteId?: string;
+};
+
+function bindAiMergeListener(): void {
+  window.addEventListener("chromnotes:ai-merge-complete", (event) => {
+    refreshNotesList();
+    const detail = (event as CustomEvent<AiMergeDetail>).detail;
+    if (detail?.noteId) {
+      const merged = getState().notes.find((note) => note.id === detail.noteId);
+      if (merged) {
+        populateForm(merged);
+        openModal("edit");
+        resetAutoSaveState();
+      }
+    }
+  });
+}
+
 function setupEventBindings(): void {
   bindEventListeners({
     onNewNote: () => {
@@ -159,6 +179,7 @@ export async function bootstrap(): Promise<void> {
   applyModalSize();
   closeSettingsPanel();
   initEditor();
+  initAiController();
 
   const initialState = await loadState();
   await applySyncPreference(initialState.useChromeSync, {
@@ -184,5 +205,6 @@ export async function bootstrap(): Promise<void> {
   refreshSettingsControls();
 
   bindGlobalStorageListener();
+  bindAiMergeListener();
   setupEventBindings();
 }

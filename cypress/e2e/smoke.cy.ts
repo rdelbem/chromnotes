@@ -39,7 +39,7 @@ describe("Chromnotes app", () => {
     cy.get("#settingsPanel").should("not.have.class", "hidden").and("be.visible");
   };
 
-  const openSettingsTab = (tab: "appearance" | "layout" | "data") => {
+  const openSettingsTab = (tab: "appearance" | "layout" | "data" | "ai") => {
     openSettings();
     cy.get(`[data-settings-tab="${tab}"]`).click();
     cy.get(`[data-settings-panel="${tab}"]`).should("have.class", "is-active").and("be.visible");
@@ -274,5 +274,83 @@ describe("Chromnotes app", () => {
     cy.contains(".note-card", "Imported Cypress Note")
       .find(".note-category")
       .should("contain.text", "Imports");
+  });
+
+  it("merges related notes through the AI brain using stubbed OpenAI responses", () => {
+    const firstTitle = "AI Research Plan";
+    const secondTitle = "AI Research Findings";
+
+    createNote(firstTitle, "Outline about AI", "AI");
+    createNote(secondTitle, "More AI research details", "AI");
+
+    let noteIds = { first: "", second: "" };
+    cy.window().then((win) => {
+      const payload = JSON.parse(win.localStorage.getItem("chromnotes_state") ?? "{}");
+      expect(payload.notes).to.have.length(2);
+      noteIds = { first: payload.notes[0].id, second: payload.notes[1].id };
+    });
+
+    cy.then(() => {
+      let callCount = 0;
+      cy.intercept("POST", "https://api.openai.com/v1/chat/completions", (req) => {
+        callCount += 1;
+        if (callCount === 1) {
+          req.reply({
+            statusCode: 200,
+            body: {
+              choices: [
+                {
+                  message: {
+                    content: JSON.stringify({
+                      summary: "AI brain found overlap with AI Research Findings.",
+                      similarNoteIds: [noteIds.second]
+                    })
+                  }
+                }
+              ]
+            }
+          });
+        } else {
+          req.reply({
+            statusCode: 200,
+            body: {
+              choices: [
+                {
+                  message: {
+                    content: JSON.stringify({
+                      title: "AI Research Hub",
+                      category: "AI Collab",
+                      content: "Merged insights from both notes.",
+                      summary: "AI merged the related notes into one."
+                    })
+                  }
+                }
+              ]
+            }
+          });
+        }
+      }).as("openAi");
+    });
+
+    openSettingsTab("ai");
+    cy.get("#aiApiKeyInput").clear().type("sk-test");
+    cy.get("#aiApiKeySaveButton").click();
+    cy.get("#aiApiKeyStatus").should("contain.text", "saved");
+    cy.get("#settingsCloseButton").click();
+    cy.get("#settingsPanel").should("have.class", "hidden");
+
+    cy.contains(".note-card", firstTitle).click();
+    cy.get("#modalOrganizeButton").should("not.be.disabled").click();
+    cy.wait("@openAi");
+
+    cy.get("#noteAssistantBanner").should("be.visible").and("contain.text", "overlap");
+    cy.get("#noteAssistantMergeButton").should("be.visible").and("not.be.disabled").click();
+    cy.wait("@openAi");
+
+    cy.contains(".note-card", "AI Research Hub").should("exist");
+    cy.contains(".note-card", firstTitle).should("not.exist");
+    cy.contains(".note-card", secondTitle).should("not.exist");
+    cy.get(".note-card").should("have.length", 1);
+    cy.get("#noteAssistantBanner").should("contain.text", "AI merged the related notes into one.");
   });
 });
