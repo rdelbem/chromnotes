@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/rdelbem/chromnotes/compare/v1.1.2...v1.1.3) (2025-12-04)
+
+
+### Bug Fixes
+
+* manifest json versioning ([c260334](https://github.com/rdelbem/chromnotes/commit/c260334ba66f8e254b9282cee04d83279ae77185))
+
 ## [1.1.2](https://github.com/rdelbem/chromnotes/compare/v1.1.1...v1.1.2) (2025-12-04)
 
 
