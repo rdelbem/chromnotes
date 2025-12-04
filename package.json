@@ -13,6 +13,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
     "build:extension": "node scripts/build-extension.mjs",
     "prepare": "husky install",
     "release": "semantic-release"
