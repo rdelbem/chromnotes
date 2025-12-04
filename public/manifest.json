@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Chromnotes",
   "description": "A sleek new tab note-taking experience with theme persistence.",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "permissions": ["storage"],
   "icons": {
     "16": "images/icon.png",
