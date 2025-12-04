@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/rdelbem/chromnotes/compare/v1.1.0...v1.1.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* organizer result fix type, and add type check on pre commit ([1c28328](https://github.com/rdelbem/chromnotes/commit/1c28328e744f9da778639974ae2a982659348a3b))
+
 # [1.1.0](https://github.com/rdelbem/chromnotes/compare/v1.0.2...v1.1.0) (2025-12-04)
 
 
