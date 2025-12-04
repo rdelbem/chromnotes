@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/rdelbem/chromnotes/compare/v1.0.1...v1.0.2) (2025-12-04)
+
+
+### Bug Fixes
+
+* zustand store number of args ([26ffa4b](https://github.com/rdelbem/chromnotes/commit/26ffa4baa68664f942862dbf826d07dfa5abc799))
+
 ## [1.0.1](https://github.com/rdelbem/chromnotes/compare/v1.0.0...v1.0.1) (2025-12-04)
 
 
