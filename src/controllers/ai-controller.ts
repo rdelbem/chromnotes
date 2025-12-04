@@ -230,7 +230,7 @@ async function handleMergeNotes(): Promise<void> {
     setBanner(
       "AI brain could not merge the notes. Please try again in a moment.",
       "error",
-      organizerResult.noteId
+      organizerResult?.noteId ?? null
     );
   } finally {
     isMerging = false;
