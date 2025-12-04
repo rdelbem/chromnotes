@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/rdelbem/chromnotes/compare/v1.0.0...v1.0.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* locked zustand version ([7d84369](https://github.com/rdelbem/chromnotes/commit/7d843693f73b79b9c5a5da960cafa9835edae948))
+
 # 1.0.0 (2025-11-15)
 
 ### Bug Fixes
