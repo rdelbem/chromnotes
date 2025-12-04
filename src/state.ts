@@ -12,8 +12,8 @@ import {
 
 const store = createStore<ChromnotesState>(() => ({ ...defaultState }));
 
-function replaceState(next: ChromnotesState, action: string): ChromnotesState {
-  store.setState(next, true, action);
+function replaceState(next: ChromnotesState, _action: string): ChromnotesState {
+  store.setState(next, true);
   return store.getState();
 }
 
