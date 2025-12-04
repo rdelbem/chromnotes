@@ -48,8 +48,16 @@ function renderDom(
       <div id="noteModal">
         <button id="modalMaximizeButton" type="button"></button>
         <button id="modalDeleteButton" type="button"></button>
+        <button id="modalOrganizeButton" type="button"></button>
         <button id="modalCancelButton" type="button"></button>
         <button id="modalSaveButton" type="button"></button>
+        <div id="noteAssistantBanner">
+          <div>
+            <p id="noteAssistantText"></p>
+            <button id="noteAssistantMergeButton" type="button"></button>
+          </div>
+          <button id="noteAssistantDismissButton" type="button"></button>
+        </div>
       </div>
     </div>
     <div id="settingsPanel" hidden>
@@ -57,6 +65,7 @@ function renderDom(
       <div>
         <button data-settings-tab="appearance" type="button"></button>
         <button data-settings-tab="layout" type="button"></button>
+        <button data-settings-tab="ai" type="button"></button>
       </div>
       <section data-settings-panel="appearance">
         ${themeChoices}
@@ -64,6 +73,7 @@ function renderDom(
       <section data-settings-panel="layout">
         ${layoutChoices}
       </section>
+      <section data-settings-panel="ai"></section>
     </div>
     <div id="settingsOverlay"></div>
     <nav id="paginationControls">
@@ -76,6 +86,10 @@ function renderDom(
     <button id="exportNotesButton" type="button"></button>
     <input id="importNotesInput" type="file" />
     <p id="importNotesStatus"></p>
+    <input id="aiApiKeyInput" />
+    <button id="aiApiKeySaveButton" type="button"></button>
+    <button id="aiApiKeyClearButton" type="button"></button>
+    <p id="aiApiKeyStatus"></p>
   `;
 }
 

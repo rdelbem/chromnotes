@@ -22,6 +22,7 @@ export const modalBackdrop = requireElement<HTMLDivElement>("modalBackdrop");
 export const modal = requireElement<HTMLDivElement>("noteModal");
 export const modalCancelButton = requireElement<HTMLButtonElement>("modalCancelButton");
 export const modalMaximizeButton = requireElement<HTMLButtonElement>("modalMaximizeButton");
+export const modalOrganizeButton = requireElement<HTMLButtonElement>("modalOrganizeButton");
 export const settingsButton = requireElement<HTMLButtonElement>("settingsButton");
 export const settingsPanel = requireElement<HTMLDivElement>("settingsPanel");
 export const settingsCloseButton = requireElement<HTMLButtonElement>("settingsCloseButton");
@@ -48,6 +49,18 @@ export const importNotesInput = requireElement<HTMLInputElement>("importNotesInp
 export const importNotesStatus = requireElement<HTMLParagraphElement>("importNotesStatus");
 export const modalDeleteButton = requireElement<HTMLButtonElement>("modalDeleteButton");
 export const modalSaveButton = requireElement<HTMLButtonElement>("modalSaveButton");
+export const noteAssistantBanner = requireElement<HTMLDivElement>("noteAssistantBanner");
+export const noteAssistantText = requireElement<HTMLParagraphElement>("noteAssistantText");
+export const noteAssistantDismissButton = requireElement<HTMLButtonElement>(
+  "noteAssistantDismissButton"
+);
+export const noteAssistantMergeButton = requireElement<HTMLButtonElement>(
+  "noteAssistantMergeButton"
+);
+export const aiApiKeyInput = requireElement<HTMLInputElement>("aiApiKeyInput");
+export const aiApiKeySaveButton = requireElement<HTMLButtonElement>("aiApiKeySaveButton");
+export const aiApiKeyClearButton = requireElement<HTMLButtonElement>("aiApiKeyClearButton");
+export const aiApiKeyStatus = requireElement<HTMLParagraphElement>("aiApiKeyStatus");
 
 const themeChoiceNodeList = document.querySelectorAll<HTMLInputElement>(
   'input[name="themeChoice"]'

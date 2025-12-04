@@ -77,6 +77,18 @@
                 >
                   Data
                 </button>
+                <button
+                  id="settingsTabAiButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabAi"
+                  data-settings-tab="ai"
+                  tabindex="-1"
+                >
+                  AI integration
+                </button>
               </div>
               <div
                 id="settingsTabAppearance"
@@ -240,6 +252,49 @@
                   ></p>
                 </div>
               </div>
+              <div
+                id="settingsTabAi"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabAiButton"
+                data-settings-panel="ai"
+                hidden
+              >
+                <h3 class="settings-panel-title">AI brain</h3>
+                <p class="settings-description">
+                  Provide your OpenAI API key to let Chromnotes ask ChatGPT whether the current note
+                  covers the same subject as other notes. The key stays on this device and is only
+                  sent to OpenAI when you click the AI brain button.
+                </p>
+                <div class="ai-settings" aria-label="AI brain settings">
+                  <div class="ai-key-row">
+                    <label class="sr-only" for="aiApiKeyInput">OpenAI API key</label>
+                    <input
+                      id="aiApiKeyInput"
+                      class="ai-key-input"
+                      type="password"
+                      placeholder="sk-..."
+                      autocomplete="off"
+                    />
+                    <button id="aiApiKeySaveButton" class="ghost-button" type="button">
+                      Save key
+                    </button>
+                    <button
+                      id="aiApiKeyClearButton"
+                      class="ghost-button danger-button"
+                      type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <p
+                    id="aiApiKeyStatus"
+                    class="ai-settings-status"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </div>
             </div>
           </div>
           <label class="theme-toggle">
@@ -314,6 +369,15 @@
                   🗑️
                 </button>
                 <button
+                  id="modalOrganizeButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Run AI brain"
+                  disabled
+                >
+                  🧠
+                </button>
+                <button
                   id="modalCancelButton"
                   class="ghost-button icon-button"
                   type="button"
@@ -334,6 +398,33 @@
             </header>
             <form id="noteForm" class="modal-form" autocomplete="off">
               <input type="hidden" id="noteId" />
+              <div
+                id="noteAssistantBanner"
+                class="note-assistant-banner"
+                role="status"
+                aria-live="polite"
+                hidden
+              >
+                <div class="note-assistant-main">
+                  <p id="noteAssistantText" class="note-assistant-text"></p>
+                  <button
+                    id="noteAssistantMergeButton"
+                    class="note-assistant-action"
+                    type="button"
+                    hidden
+                  >
+                    Merge related notes with AI
+                  </button>
+                </div>
+                <button
+                  id="noteAssistantDismissButton"
+                  class="note-assistant-dismiss"
+                  type="button"
+                  aria-label="Dismiss AI brain message"
+                >
+                  ✕
+                </button>
+              </div>
               <div class="field-row">
                 <div class="field">
                   <label for="noteTitle">Title</label>

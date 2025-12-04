@@ -15,6 +15,7 @@ import {
 import { setEditorContent } from "./editor";
 import { formatDate, getState, updateState } from "./state";
 import { Note } from "./types";
+import { handleActiveNoteChange } from "./controllers/ai-controller";
 
 function clampPage(page: number, totalPages: number): number {
   if (!Number.isFinite(page) || page < 1) return 1;
@@ -29,6 +30,8 @@ export function setActiveNote(id: string | null): void {
   notesContainer.querySelectorAll<HTMLLIElement>(".note-card").forEach((item) => {
     item.classList.toggle("active", item.dataset.id === id);
   });
+
+  handleActiveNoteChange(id);
 }
 
 export function populateForm(note: Note | null): void {

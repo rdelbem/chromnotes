@@ -1,3 +1,11 @@
+## [Unreleased]
+
+### Features
+
+* add ChatGPT-powered AI brain button, including a dedicated AI integration settings tab for the user-supplied OpenAI API key
+* theme-aware AI brain banner with a dismiss button plus note selection colors that follow the active theme
+* enable AI brain to suggest similar notes and merge them into a single AI-crafted note (with new categories when needed)
+
 ## [1.0.2](https://github.com/rdelbem/chromnotes/compare/v1.0.1...v1.0.2) (2025-12-04)
 
 
