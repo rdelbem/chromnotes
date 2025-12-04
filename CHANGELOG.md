@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/rdelbem/chromnotes/compare/v1.0.2...v1.1.0) (2025-12-04)
+
+
+### Features
+
+* added AI tools for notes ([4c8d05c](https://github.com/rdelbem/chromnotes/commit/4c8d05ce0080fd5d83bec1b50781c5c5d82377a9))
+
 ## [Unreleased]
 
 ### Features
