@@ -241,6 +241,18 @@ body[data-theme="girly-girl"] {
   letter-spacing: -0.04em;
 }
 
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
 .subtitle {
   margin: 0.35rem 0 0;
   color: var(--text-secondary);
@@ -251,6 +263,46 @@ body[data-theme="girly-girl"] {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.header-search-slot {
+  display: none;
+  align-items: center;
+  max-width: 360px;
+  width: 100%;
+}
+
+.header-search-slot.is-active {
+  display: flex;
+}
+
+.list-search-home {
+  width: 100%;
+  max-width: 360px;
+}
+
+.list-search-home.is-hidden {
+  display: none;
+}
+
+.search-field-wrapper input {
+  width: 100%;
+}
+
+.search-field-wrapper {
+  position: relative;
+}
+
+.search-field-wrapper input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.search-field-wrapper input:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .ghost-button,
@@ -272,6 +324,12 @@ body[data-theme="girly-girl"] {
 
 .ghost-button:hover {
   background: var(--surface-elevated);
+}
+
+.ghost-button:active,
+.primary-button:active,
+.danger-button:active {
+  transform: translateY(2px);
 }
 
 .primary-button {
@@ -651,6 +709,43 @@ body[data-layout="desktop"] #noteContent {
   color: var(--text-primary);
   min-width: 160px;
   appearance: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#categoryFilter:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+@supports selector(select::part(listbox)) {
+  #categoryFilter {
+    appearance: base-select;
+    --category-list-bg: var(--surface);
+    --category-list-border: var(--border);
+  }
+
+  #categoryFilter::part(listbox) {
+    margin-top: 0.35rem;
+    border-radius: 18px;
+    padding: 0.35rem;
+    border: 1px solid var(--category-list-border);
+    background: var(--category-list-bg);
+    box-shadow: 0 24px 55px rgba(15, 23, 42, 0.35);
+  }
+
+  #categoryFilter::part(option) {
+    border-radius: 14px;
+    padding: 0.55rem 0.75rem;
+    margin: 0.15rem 0;
+  }
+
+  #categoryFilter::part(option):is(:hover, :focus-visible, :checked) {
+    background: color-mix(in srgb, var(--accent) 22%, var(--surface) 78%);
+    color: var(--text-primary);
+  }
 }
 
 #notesContainer {
@@ -1132,17 +1227,17 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(92vw, 520px);
-  max-height: min(calc(100vh - 3rem), 720px);
+  width: min(96vw, 640px);
+  max-height: min(calc(100vh - 2rem), 800px);
   overflow-y: auto;
   padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 4vw, 2rem);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  box-shadow: 0 28px 60px rgba(9, 11, 18, 0.45);
+  border-radius: 24px;
+  box-shadow: 0 32px 70px rgba(9, 11, 18, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
   z-index: 120;
 }
 
@@ -1157,21 +1252,26 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
   padding: 0.35rem;
   border-radius: 999px;
   background: var(--surface-elevated);
+  flex-wrap: nowrap;
+  width: 100%;
 }
 
 .settings-tab {
-  flex: 1 1 auto;
+  flex: 1 1 clamp(90px, 20vw, 140px);
   border: none;
   background: transparent;
   color: var(--text-secondary);
   font: inherit;
   font-weight: 600;
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 0.75rem;
   border-radius: 999px;
   cursor: pointer;
   transition:
     background 0.2s ease,
     color 0.2s ease;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .settings-tab:hover,
@@ -1478,6 +1578,56 @@ body[data-layout="desktop"] .modal.modal--maximized .editor {
 
 .theme-option[data-theme="girly-girl"] .color-chip[data-color="purple"] {
   background: #d946ef;
+}
+
+.appearance-options {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.appearance-option {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+
+.appearance-option:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.appearance-option input[type="radio"] {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.appearance-option-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.appearance-option-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.appearance-option-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.appearance-option input[type="radio"]:checked + .appearance-option-copy .appearance-option-name {
+  color: var(--accent);
 }
 
 .settings-divider {

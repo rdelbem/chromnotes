@@ -11,18 +11,48 @@ import {
   settingsTabPanels,
   syncToggle,
   themeChoiceInputs,
-  themeToggle
+  themeToggle,
+  appearanceThemeChoiceInputs,
+  headerSearchSlot,
+  listSearchHome,
+  searchFieldWrapper
 } from "../dom";
 import { openModal, closeModal, setModalMaximized } from "../modal";
-import { Theme } from "../types";
+import { Theme, AppearanceTheme } from "../types";
 import { getState, updateState, persistState, isChromeSyncAvailable } from "../state";
+import { ensureAppearanceThemeStyles } from "../services/theme-loader";
 
 const chromeSyncAvailable = isChromeSyncAvailable();
 const LIGHT_THEME_SET = new Set<Theme>(["light", "dawn", "paper", "girly-girl"]);
-const DEFAULT_SETTINGS_TAB = settingsTabButtons[0]?.dataset.settingsTab ?? "appearance";
+const DEFAULT_SETTINGS_TAB = settingsTabButtons[0]?.dataset.settingsTab ?? "palettes";
 let activeSettingsTab = DEFAULT_SETTINGS_TAB;
 let settingsOpen = false;
 let refreshNotesListCallback: (() => void) | null = null;
+
+function moveSearchWrapper(target: HTMLElement | null): void {
+  if (!target || !searchFieldWrapper) {
+    return;
+  }
+  if (searchFieldWrapper.parentElement === target) {
+    return;
+  }
+  target.appendChild(searchFieldWrapper);
+}
+
+function syncSearchPlacement(theme: AppearanceTheme): void {
+  if (!headerSearchSlot || !listSearchHome) {
+    return;
+  }
+  if (theme === "windup") {
+    headerSearchSlot.classList.add("is-active");
+    listSearchHome.classList.add("is-hidden");
+    moveSearchWrapper(headerSearchSlot);
+  } else {
+    headerSearchSlot.classList.remove("is-active");
+    listSearchHome.classList.remove("is-hidden");
+    moveSearchWrapper(listSearchHome);
+  }
+}
 
 export function registerSettingsNotesRefresh(callback: () => void): void {
   refreshNotesListCallback = callback;
@@ -55,6 +85,9 @@ export function refreshSettingsControls(): void {
   themeToggle.checked = !isLightTheme(state.theme);
   themeChoiceInputs.forEach((input) => {
     input.checked = input.value === state.theme;
+  });
+  appearanceThemeChoiceInputs.forEach((input) => {
+    input.checked = input.value === state.appearanceTheme;
   });
   compactToggle.checked = state.compactView;
   syncToggle.checked = state.useChromeSync && chromeSyncAvailable;
@@ -104,6 +137,21 @@ export function applyTheme(theme: Theme): void {
   updateState({ theme: nextTheme });
   document.body.dataset.theme = nextTheme;
   refreshSettingsControls();
+}
+
+export async function applyAppearanceTheme(
+  theme: AppearanceTheme,
+  options: { persist?: boolean } = {}
+): Promise<void> {
+  const { persist = true } = options;
+  await ensureAppearanceThemeStyles(theme);
+  updateState({ appearanceTheme: theme });
+  document.body.dataset.appearanceTheme = theme;
+  syncSearchPlacement(theme);
+  refreshSettingsControls();
+  if (persist) {
+    await persistState({ appearanceTheme: theme });
+  }
 }
 
 export function applyCompactView(

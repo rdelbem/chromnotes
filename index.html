@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Chromnotes</title>
   </head>
-  <body data-theme="dark">
+  <body data-theme="dark" data-appearance-theme="classic">
     <div class="app">
       <header class="app-header">
         <div class="title-group">
+          <img class="app-icon" src="images/icon.png" alt="" aria-hidden="true" />
           <h1>Chromnotes</h1>
           <p class="subtitle">Capture quick notes every time you open a new tab.</p>
         </div>
         <div class="header-actions">
+          <div id="headerSearchSlot" class="header-search-slot"></div>
           <div class="settings-container">
             <button
               id="settingsButton"
@@ -43,15 +45,27 @@
               </button>
               <div class="settings-tabs" role="tablist" aria-label="Settings sections">
                 <button
-                  id="settingsTabAppearanceButton"
+                  id="settingsTabPalettesButton"
                   class="settings-tab settings-tab--active"
                   type="button"
                   role="tab"
                   aria-selected="true"
-                  aria-controls="settingsTabAppearance"
-                  data-settings-tab="appearance"
+                  aria-controls="settingsTabPalettes"
+                  data-settings-tab="palettes"
                 >
-                  Appearance
+                  Palettes
+                </button>
+                <button
+                  id="settingsTabThemesButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabThemes"
+                  data-settings-tab="themes"
+                  tabindex="-1"
+                >
+                  Themes
                 </button>
                 <button
                   id="settingsTabLayoutButton"
@@ -91,13 +105,13 @@
                 </button>
               </div>
               <div
-                id="settingsTabAppearance"
+                id="settingsTabPalettes"
                 class="settings-tabpanel is-active"
                 role="tabpanel"
-                aria-labelledby="settingsTabAppearanceButton"
-                data-settings-panel="appearance"
+                aria-labelledby="settingsTabPalettesButton"
+                data-settings-panel="palettes"
               >
-                <h3 class="settings-panel-title">Theme</h3>
+                <h3 class="settings-panel-title">Palette</h3>
                 <div class="theme-options" role="radiogroup" aria-label="Theme">
                   <label class="theme-option" data-theme="light">
                     <input type="radio" name="themeChoice" value="light" />
@@ -176,6 +190,43 @@
                       <span class="color-chip" data-color="yellow"></span>
                       <span class="color-chip" data-color="cyan"></span>
                       <span class="color-chip" data-color="purple"></span>
+                    </span>
+                  </label>
+                </div>
+                <p class="settings-description">
+                  Pick your favorite color palette above, then pair it with an interface theme below
+                  — every combination works.
+                </p>
+              </div>
+              <div
+                id="settingsTabThemes"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabThemesButton"
+                data-settings-panel="themes"
+                hidden
+              >
+                <h3 class="settings-panel-title">Theme</h3>
+                <p class="settings-description">
+                  Choose the interface layout that matches your flow.
+                </p>
+                <div class="appearance-options" role="radiogroup" aria-label="Interface theme">
+                  <label class="appearance-option" data-appearance-theme="classic">
+                    <input type="radio" name="appearanceThemeChoice" value="classic" />
+                    <span class="appearance-option-copy">
+                      <span class="appearance-option-name">Classic</span>
+                      <span class="appearance-option-description">
+                        Rounded cards & comfortable spacing
+                      </span>
+                    </span>
+                  </label>
+                  <label class="appearance-option" data-appearance-theme="windup">
+                    <input type="radio" name="appearanceThemeChoice" value="windup" />
+                    <span class="appearance-option-copy">
+                      <span class="appearance-option-name">Windup</span>
+                      <span class="appearance-option-description">
+                        Sleek night mode with pill inputs and sidebar contrast
+                      </span>
                     </span>
                   </label>
                 </div>
@@ -322,7 +373,11 @@
           <section class="notes-panel">
             <div class="list-header">
               <h2>Notes</h2>
-              <input id="searchInput" type="search" placeholder="Search notes..." />
+              <div id="listSearchHome" class="list-search-home">
+                <div id="searchFieldWrapper" class="search-field-wrapper">
+                  <input id="searchInput" type="search" placeholder="Search notes..." />
+                </div>
+              </div>
               <select id="categoryFilter" aria-label="Filter by category"></select>
             </div>
             <ul id="notesContainer" aria-live="polite"></ul>

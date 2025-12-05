@@ -1,0 +1,271 @@
+body[data-appearance-theme="windup"] {
+  --windup-bg: color-mix(in srgb, var(--app-bg) 85%, #05070a 15%);
+  --windup-surface: color-mix(in srgb, var(--surface) 92%, #05070a 8%);
+  --windup-ink: var(--text-primary);
+  --windup-muted: color-mix(in srgb, var(--text-secondary) 90%, var(--text-primary) 10%);
+  --windup-pill: color-mix(in srgb, var(--surface-elevated) 85%, var(--app-bg) 15%);
+  --windup-border: color-mix(in srgb, var(--border) 80%, transparent);
+  --windup-cta: color-mix(in srgb, var(--accent) 75%, var(--surface) 25%);
+  --windup-cta-ink: var(--accent-contrast);
+  font-family:
+    "Inter",
+    "Noto Sans",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: var(--windup-bg);
+  color: var(--windup-ink);
+  letter-spacing: 0.01em;
+}
+
+body[data-appearance-theme="windup"] .app {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  gap: 0;
+  min-height: 100vh;
+}
+
+body[data-appearance-theme="windup"] .app-header {
+  background: var(--windup-bg);
+  border: none;
+  border-bottom: 1px solid var(--windup-border);
+  border-radius: 0;
+  padding: 0.9rem clamp(1.5rem, 5vw, 3.5rem);
+  align-items: center;
+  box-shadow: none;
+}
+
+body[data-appearance-theme="windup"] .title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+body[data-appearance-theme="windup"] .title-group h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--windup-ink);
+}
+
+body[data-appearance-theme="windup"] .subtitle {
+  display: none;
+}
+
+body[data-appearance-theme="windup"] .app-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.35));
+}
+
+body[data-appearance-theme="windup"] .header-actions {
+  align-items: center;
+  gap: 0.85rem;
+}
+
+body[data-appearance-theme="windup"] .header-search-slot {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 1rem;
+}
+
+body[data-appearance-theme="windup"] .header-search-slot .search-field-wrapper {
+  width: min(360px, 100%);
+  background: var(--windup-pill);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--windup-border) 75%, transparent);
+  padding: 0.35rem 0.85rem 0.35rem 2.75rem;
+  color: var(--windup-muted);
+}
+
+body[data-appearance-theme="windup"] .header-search-slot .search-field-wrapper::before {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 256 256'%3E%3Cpath fill='%239dadbe' d='M229.66 218.34l-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32ZM40 112a72 72 0 1 1 72 72A72.08 72.08 0 0 1 40 112Z'/%3E%3C/svg%3E");
+}
+
+body[data-appearance-theme="windup"] .header-search-slot #searchInput {
+  border: none;
+  background: transparent;
+  padding: 0;
+  height: auto;
+  font-size: 0.95rem;
+  color: var(--windup-ink);
+}
+
+body[data-appearance-theme="windup"] .header-search-slot #searchInput::placeholder {
+  color: var(--windup-muted);
+}
+
+body[data-appearance-theme="windup"] .theme-toggle,
+body[data-appearance-theme="windup"] .donate-button {
+  display: none;
+}
+
+body[data-appearance-theme="windup"] .header-actions .ghost-button,
+body[data-appearance-theme="windup"] .header-actions .primary-button {
+  background: var(--windup-pill);
+  border: 1px solid color-mix(in srgb, var(--windup-border) 70%, transparent);
+  border-radius: 14px;
+  padding: 0.4rem 0.9rem;
+  color: var(--windup-ink);
+}
+
+body[data-appearance-theme="windup"] .layout-columns {
+  padding: 2rem clamp(1.5rem, 5vw, 3.5rem) 3.5rem;
+}
+
+body[data-appearance-theme="windup"] .main-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+body[data-appearance-theme="windup"] .notes-panel {
+  width: 100%;
+  max-width: 1040px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+body[data-appearance-theme="windup"] .list-header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 0;
+  margin-bottom: 1.25rem;
+}
+
+body[data-appearance-theme="windup"] .list-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--windup-ink);
+}
+
+body[data-appearance-theme="windup"] #notesContainer {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+body[data-appearance-theme="windup"] .note-card {
+  background: transparent;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  padding: 1rem 0.75rem;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+body[data-appearance-theme="windup"] .note-card:hover {
+  background: color-mix(in srgb, var(--windup-pill) 45%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+body[data-appearance-theme="windup"] .note-card.active {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+body[data-appearance-theme="windup"] .note-title {
+  color: var(--windup-ink);
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+body[data-appearance-theme="windup"] .note-preview,
+body[data-appearance-theme="windup"] .note-meta {
+  color: var(--windup-muted);
+}
+
+body[data-appearance-theme="windup"] #paginationStatus,
+body[data-appearance-theme="windup"] .empty-state {
+  color: var(--windup-muted);
+}
+
+body[data-appearance-theme="windup"] #newNoteButton {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  border: none;
+  padding: 0;
+  font-size: 0;
+  background: var(--windup-cta);
+  color: transparent;
+  box-shadow: 0 20px 50px rgba(3, 7, 18, 0.55);
+}
+
+body[data-appearance-theme="windup"] #newNoteButton::after {
+  content: "+";
+  color: var(--windup-cta-ink);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+body[data-appearance-theme="windup"] .modal {
+  border-radius: 28px;
+  border: none;
+  background: var(--windup-bg);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+}
+
+body[data-appearance-theme="windup"][data-layout="desktop"] .modal.modal--maximized {
+  border: none;
+}
+
+body[data-appearance-theme="windup"] input,
+body[data-appearance-theme="windup"] .editor {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--surface) 85%, #02050c 15%);
+  color: var(--windup-ink);
+}
+
+body[data-appearance-theme="windup"] .editor {
+  min-height: 260px;
+}
+body[data-appearance-theme="windup"] #categoryFilter {
+  background: var(--windup-pill);
+  border: 1px solid color-mix(in srgb, var(--windup-border) 70%, transparent);
+  color: var(--windup-ink);
+  min-width: 140px;
+  --category-list-bg: var(--windup-pill);
+  --category-list-border: color-mix(in srgb, var(--windup-border) 80%, transparent);
+}
+
+body[data-appearance-theme="windup"] #categoryFilter:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+@supports selector(select::part(listbox)) {
+  body[data-appearance-theme="windup"] #categoryFilter::part(listbox) {
+    background: color-mix(in srgb, var(--windup-pill) 90%, var(--windup-bg) 10%);
+    box-shadow: 0 30px 60px rgba(3, 7, 18, 0.45);
+  }
+
+  body[data-appearance-theme="windup"]
+    #categoryFilter::part(option):is(:hover, :focus-visible, :checked) {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--windup-ink);
+  }
+}

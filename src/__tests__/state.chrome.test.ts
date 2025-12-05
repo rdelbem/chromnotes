@@ -187,6 +187,7 @@ describe("state chrome storage integration", () => {
       notes: [createNote({ id: "fallback" })],
       categoryIndex: { General: ["fallback"] },
       theme: "dark",
+      appearanceTheme: "classic",
       selectedNoteId: "fallback",
       currentPage: 1,
       notesPerPage: 10,
