@@ -12,7 +12,10 @@ export const THEMES = [
   "girly-girl"
 ] as const;
 
+export const APPEARANCE_THEMES = ["classic", "windup"] as const;
+
 export type Theme = (typeof THEMES)[number];
+export type AppearanceTheme = (typeof APPEARANCE_THEMES)[number];
 
 export type SerializedEditorData = OutputData;
 
@@ -30,6 +33,7 @@ export type ChromnotesState = {
   notes: Note[];
   categoryIndex: Record<string, string[]>;
   theme: Theme;
+  appearanceTheme: AppearanceTheme;
   selectedNoteId: string | null;
   currentPage: number;
   notesPerPage: number;
@@ -45,6 +49,7 @@ export const defaultState: ChromnotesState = {
   notes: [],
   categoryIndex: {},
   theme: "dark",
+  appearanceTheme: "classic",
   selectedNoteId: null,
   currentPage: 1,
   notesPerPage: 10,

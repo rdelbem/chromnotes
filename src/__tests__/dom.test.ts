@@ -1,7 +1,15 @@
 function renderDom(
-  options: { includeThemeChoices?: boolean; includeLayoutChoices?: boolean } = {}
+  options: {
+    includeThemeChoices?: boolean;
+    includeLayoutChoices?: boolean;
+    includeAppearanceChoices?: boolean;
+  } = {}
 ): void {
-  const { includeThemeChoices = true, includeLayoutChoices = true } = options;
+  const {
+    includeThemeChoices = true,
+    includeLayoutChoices = true,
+    includeAppearanceChoices = true
+  } = options;
   const themeChoices = includeThemeChoices
     ? `
         <label>
@@ -28,9 +36,23 @@ function renderDom(
       `
     : "";
 
+  const appearanceChoices = includeAppearanceChoices
+    ? `
+        <label>
+          <input type="radio" name="appearanceThemeChoice" value="classic" />
+          <span>Classic</span>
+        </label>
+        <label>
+          <input type="radio" name="appearanceThemeChoice" value="windup" />
+          <span>Windup</span>
+        </label>
+      `
+    : "";
+
   document.body.innerHTML = `
     <header>
       <button id="settingsButton" type="button"></button>
+      <div id="headerSearchSlot"></div>
     </header>
     <form id="noteForm">
       <input id="noteTitle" />
@@ -40,7 +62,11 @@ function renderDom(
     </form>
     <ul id="notesContainer"></ul>
     <p id="emptyState"></p>
-    <input id="searchInput" />
+    <div id="listSearchHome">
+      <div id="searchFieldWrapper">
+        <input id="searchInput" />
+      </div>
+    </div>
     <select id="categoryFilter"></select>
     <input id="themeToggle" type="checkbox" />
     <button id="newNoteButton" type="button"></button>
@@ -63,12 +89,16 @@ function renderDom(
     <div id="settingsPanel" hidden>
       <button id="settingsCloseButton" type="button"></button>
       <div>
-        <button data-settings-tab="appearance" type="button"></button>
+        <button data-settings-tab="palettes" type="button"></button>
+        <button data-settings-tab="themes" type="button"></button>
         <button data-settings-tab="layout" type="button"></button>
         <button data-settings-tab="ai" type="button"></button>
       </div>
-      <section data-settings-panel="appearance">
+      <section data-settings-panel="palettes">
         ${themeChoices}
+      </section>
+      <section data-settings-panel="themes">
+        ${appearanceChoices}
       </section>
       <section data-settings-panel="layout">
         ${layoutChoices}
@@ -108,6 +138,7 @@ describe("dom bindings", () => {
     expect(domModule.titleInput.id).toBe("noteTitle");
     expect(domModule.themeChoiceInputs).toHaveLength(2);
     expect(domModule.layoutChoiceInputs).toHaveLength(2);
+    expect(domModule.appearanceThemeChoiceInputs).toHaveLength(2);
   });
 
   test("throws descriptive error when required element is missing", async () => {
@@ -126,5 +157,12 @@ describe("dom bindings", () => {
   test("throws when layout options are not present", async () => {
     renderDom({ includeLayoutChoices: false });
     await expect(import("../dom")).rejects.toThrow("Chromnotes: missing layout choice inputs.");
+  });
+
+  test("throws when appearance theme options are not present", async () => {
+    renderDom({ includeAppearanceChoices: false });
+    await expect(import("../dom")).rejects.toThrow(
+      "Chromnotes: missing appearance theme choice inputs."
+    );
   });
 });

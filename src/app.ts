@@ -12,7 +12,8 @@ import {
   applyViewMode,
   closeSettingsPanel,
   refreshSettingsControls,
-  registerSettingsNotesRefresh
+  registerSettingsNotesRefresh,
+  applyAppearanceTheme
 } from "./controllers/settings-controller";
 import { registerNotesListRefresher, resetAutoSaveState } from "./controllers/autosave-controller";
 import { parseNotesFromText, persistImportedNotes } from "./services/data-transfer";
@@ -124,6 +125,7 @@ function bindGlobalStorageListener(): void {
     if (event.key !== STORAGE_FALLBACK_KEY) return;
     await loadState();
     applyTheme(getState().theme);
+    await applyAppearanceTheme(getState().appearanceTheme, { persist: false });
     applyCompactView(getState().compactView, { refresh: false, syncState: false });
     await applyViewMode(getState().viewMode, { persist: false });
     refreshNotesList();
@@ -186,6 +188,7 @@ export async function bootstrap(): Promise<void> {
     persist: false
   });
   applyTheme(initialState.theme);
+  await applyAppearanceTheme(initialState.appearanceTheme, { persist: false });
   applyCompactView(initialState.compactView, { refresh: false, syncState: false });
   refreshNotesList();
 

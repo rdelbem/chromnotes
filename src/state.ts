@@ -7,7 +7,9 @@ import {
   STORAGE_FALLBACK_KEY,
   defaultState,
   Theme,
-  THEMES
+  THEMES,
+  AppearanceTheme,
+  APPEARANCE_THEMES
 } from "./types";
 
 const store = createStore<ChromnotesState>(() => ({ ...defaultState }));
@@ -30,6 +32,7 @@ const supportsChromeSync =
 let _activeChromeStorage: "sync" | "local" = supportsChromeSync ? "sync" : "local";
 
 const THEME_SET = new Set<Theme>(THEMES);
+const APPEARANCE_THEME_SET = new Set<AppearanceTheme>(APPEARANCE_THEMES);
 
 function sanitizeEditorData(data: unknown): SerializedEditorData | null {
   if (!data || typeof data !== "object") {
@@ -120,6 +123,17 @@ function coerceTheme(theme: unknown): Theme {
   return defaultState.theme;
 }
 
+function isValidAppearanceTheme(theme: unknown): theme is AppearanceTheme {
+  return typeof theme === "string" && APPEARANCE_THEME_SET.has(theme as AppearanceTheme);
+}
+
+function coerceAppearanceTheme(theme: unknown): AppearanceTheme {
+  if (isValidAppearanceTheme(theme)) {
+    return theme;
+  }
+  return defaultState.appearanceTheme;
+}
+
 function normalizeNotesPerPage(value?: number): number {
   if (!Number.isFinite(value) || (value ?? 0) <= 0) {
     return defaultState.notesPerPage;
@@ -164,6 +178,7 @@ function normalizeState(partial?: Partial<ChromnotesState>): ChromnotesState {
     notes: sanitizedNotes,
     categoryIndex: buildCategoryIndex(sanitizedNotes),
     theme: coerceTheme(partial?.theme),
+    appearanceTheme: coerceAppearanceTheme(partial?.appearanceTheme),
     selectedNoteId: typeof partial?.selectedNoteId === "string" ? partial.selectedNoteId : null,
     notesPerPage,
     currentPage: clampPage(partial?.currentPage ?? defaultState.currentPage, totalPages),
@@ -201,7 +216,8 @@ async function readFromChromeStorage(
           "useChromeSync",
           "activeCategory",
           "viewMode",
-          "categoryIndex"
+          "categoryIndex",
+          "appearanceTheme"
         ],
         (items) => {
           if (chrome.runtime?.lastError) {
@@ -265,6 +281,12 @@ export function updateState(partial: Partial<ChromnotesState>): ChromnotesState 
     merged.theme = previous.theme;
   }
 
+  if (isValidAppearanceTheme(partial.appearanceTheme)) {
+    merged.appearanceTheme = partial.appearanceTheme;
+  } else if (!isValidAppearanceTheme(merged.appearanceTheme)) {
+    merged.appearanceTheme = previous.appearanceTheme;
+  }
+
   merged.notesPerPage = normalizeNotesPerPage(partial.notesPerPage ?? previous.notesPerPage);
   merged.notes = partial.notes ? sanitizeNotes(partial.notes) : merged.notes;
   merged.categoryIndex = buildCategoryIndex(merged.notes);
@@ -307,6 +329,7 @@ export function resetState(initial?: ChromnotesState): ChromnotesState {
     ...normalized,
     notes: [...normalized.notes],
     categoryIndex: buildCategoryIndex(normalized.notes),
+    appearanceTheme: coerceAppearanceTheme(initial?.appearanceTheme),
     notesPerPage: normalizeNotesPerPage(initial?.notesPerPage ?? defaultState.notesPerPage),
     currentPage: clampPage(
       initial?.currentPage ?? defaultState.currentPage,

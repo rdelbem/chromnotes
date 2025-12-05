@@ -61,6 +61,7 @@ describe("state utilities", () => {
       notes: [note],
       categoryIndex: { General: [note.id] },
       theme: "dark",
+      appearanceTheme: "classic",
       selectedNoteId: note.id,
       currentPage: 2,
       notesPerPage: 10,

@@ -14,6 +14,9 @@ export const noteIdInput = requireElement<HTMLInputElement>("noteId");
 export const notesContainer = requireElement<HTMLUListElement>("notesContainer");
 export const emptyState = requireElement<HTMLParagraphElement>("emptyState");
 export const searchInput = requireElement<HTMLInputElement>("searchInput");
+export const headerSearchSlot = requireElement<HTMLDivElement>("headerSearchSlot");
+export const listSearchHome = requireElement<HTMLDivElement>("listSearchHome");
+export const searchFieldWrapper = requireElement<HTMLDivElement>("searchFieldWrapper");
 export const categoryFilter = requireElement<HTMLSelectElement>("categoryFilter");
 export const themeToggle = requireElement<HTMLInputElement>("themeToggle");
 export const newNoteButton = requireElement<HTMLButtonElement>("newNoteButton");
@@ -81,3 +84,13 @@ if (!layoutChoiceNodeList.length) {
 }
 
 export const layoutChoiceInputs = Array.from(layoutChoiceNodeList);
+
+const appearanceThemeChoiceNodeList = document.querySelectorAll<HTMLInputElement>(
+  'input[name="appearanceThemeChoice"]'
+);
+
+if (!appearanceThemeChoiceNodeList.length) {
+  throw new Error("Chromnotes: missing appearance theme choice inputs.");
+}
+
+export const appearanceThemeChoiceInputs = Array.from(appearanceThemeChoiceNodeList);

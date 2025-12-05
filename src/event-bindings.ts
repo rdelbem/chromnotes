@@ -23,15 +23,17 @@ import {
   syncToggle,
   themeChoiceInputs,
   themeToggle,
+  appearanceThemeChoiceInputs,
   titleInput
 } from "./dom";
-import { Theme } from "./types";
+import { Theme, AppearanceTheme } from "./types";
 import { getState, persistState } from "./state";
 import { toggleModalSize, isModalOpen } from "./modal";
 import {
   applyCompactView,
   applySyncPreference,
   applyTheme,
+  applyAppearanceTheme,
   applyViewMode,
   chromeSyncAvailable,
   closeSettingsPanel,
@@ -115,6 +117,14 @@ export function bindEventListeners(options: EventBindingOptions): void {
       const selectedTheme = input.value as Theme;
       applyTheme(selectedTheme);
       void persistState({ theme: selectedTheme });
+    });
+  });
+
+  appearanceThemeChoiceInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      if (!input.checked) return;
+      const selectedTheme = input.value as AppearanceTheme;
+      void applyAppearanceTheme(selectedTheme);
     });
   });
 
