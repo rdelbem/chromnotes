@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/rdelbem/chromnotes/compare/v1.1.3...v1.2.0) (2025-12-05)
+
+
+### Features
+
+* big refactoring, added theme support and fixed the windup theme, and the classic one ([4fe6e18](https://github.com/rdelbem/chromnotes/commit/4fe6e18fbe95eb620d90e69660c84e54a9dfa31c))
+
 ## [1.1.3](https://github.com/rdelbem/chromnotes/compare/v1.1.2...v1.1.3) (2025-12-04)
 
 
