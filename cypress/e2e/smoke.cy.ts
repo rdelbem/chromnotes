@@ -353,4 +353,43 @@ describe("Chromnotes app", () => {
     cy.get(".note-card").should("have.length", 1);
     cy.get("#noteAssistantBanner").should("contain.text", "AI merged the related notes into one.");
   });
+
+  it("copies the current note to the clipboard via the copy button", () => {
+    const noteTitle = "Clipboard Note";
+    const noteContent = "Clipboard body text";
+    createNote(noteTitle, noteContent, "Clipboard");
+
+    cy.contains(".note-card", noteTitle).click();
+    cy.get("#modalBackdrop").should("not.have.class", "hidden");
+
+    cy.window().then((win) => {
+      if (!win.navigator.clipboard) {
+        // @ts-expect-error - injecting mock clipboard for test
+        win.navigator.clipboard = {} as Clipboard;
+      }
+      cy.stub(win.navigator.clipboard, "writeText").as("writeText").resolves();
+    });
+
+    cy.get("#modalCopyButton").click();
+    cy.get("@writeText").should("have.been.calledWith", `${noteTitle}\n\n${noteContent}`);
+  });
+
+  it("supports undo and redo for recent changes", () => {
+    const noteTitle = "Undoable Note";
+    const noteContent = "Undoable content";
+    createNote(noteTitle, noteContent, "History");
+
+    cy.contains(".note-card", noteTitle).click();
+    cy.get("#modalBackdrop").should("not.have.class", "hidden");
+
+    cy.clock();
+    cy.get("#noteTitle").clear().type("Updated Title");
+    cy.tick(2100); // allow history snapshot to flush (2s delay)
+
+    cy.get("#modalUndoButton").click();
+    cy.get("#noteTitle").should("have.value", noteTitle);
+
+    cy.get("#modalRedoButton").click();
+    cy.get("#noteTitle").should("have.value", "Updated Title");
+  });
 });

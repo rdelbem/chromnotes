@@ -477,4 +477,81 @@ describe("app interactions", () => {
       (navigator as unknown as { clipboard?: unknown }).clipboard = originalClipboard;
     }
   });
+
+  test("undo button restores previous snapshot", async () => {
+    jest.useFakeTimers();
+    const note = createNote({
+      id: "undo-note",
+      title: "Undo Title",
+      content: "Undo Content",
+      contentRaw: {
+        blocks: [{ type: "paragraph", data: { text: "Undo Content" } }]
+      } as Note["contentRaw"]
+    });
+    withSnapshot({
+      notes: [note],
+      selectedNoteId: note.id,
+      categoryIndex: { [note.category]: [note.id] }
+    });
+    mockEditor();
+    await bootstrapApp();
+
+    const noteCard = document.querySelector(".note-card") as HTMLLIElement;
+    noteCard.click();
+    await flushAsync();
+
+    const titleInput = document.getElementById("noteTitle") as HTMLInputElement;
+    titleInput.value = "Updated Title";
+    titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    await jest.advanceTimersByTimeAsync(2000);
+    await flushAsync();
+
+    const undoButton = document.getElementById("modalUndoButton") as HTMLButtonElement;
+    undoButton.click();
+    await flushAsync();
+
+    expect(titleInput.value).toBe("Undo Title");
+  });
+
+  test("redo button restores next snapshot", async () => {
+    jest.useFakeTimers();
+    const note = createNote({
+      id: "redo-note",
+      title: "Redo Title",
+      content: "Redo Content",
+      contentRaw: {
+        blocks: [{ type: "paragraph", data: { text: "Redo Content" } }]
+      } as Note["contentRaw"]
+    });
+    withSnapshot({
+      notes: [note],
+      selectedNoteId: note.id,
+      categoryIndex: { [note.category]: [note.id] }
+    });
+    mockEditor();
+    await bootstrapApp();
+
+    const noteCard = document.querySelector(".note-card") as HTMLLIElement;
+    noteCard.click();
+    await flushAsync();
+
+    const titleInput = document.getElementById("noteTitle") as HTMLInputElement;
+    titleInput.value = "Updated Again";
+    titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    await jest.advanceTimersByTimeAsync(2000);
+    await flushAsync();
+
+    const undoButton = document.getElementById("modalUndoButton") as HTMLButtonElement;
+    undoButton.click();
+    await flushAsync();
+    expect(titleInput.value).toBe("Redo Title");
+
+    const redoButton = document.getElementById("modalRedoButton") as HTMLButtonElement;
+    redoButton.click();
+    await flushAsync();
+
+    expect(titleInput.value).toBe("Updated Again");
+  });
 });

@@ -30,7 +30,9 @@ export function mockEditor(options: MockEditorOptions = {}): void {
             : jest.fn(() => Promise.resolve({ blocks: [] }));
         return {
           render: jest.fn(() => Promise.resolve()),
-          save: saveMock
+          save: saveMock,
+          undo: jest.fn(() => Promise.resolve()),
+          redo: jest.fn(() => Promise.resolve())
         };
       })
     };

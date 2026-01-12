@@ -229,6 +229,22 @@ export function setEditorValue(value: string): void {
   setEditorContent(null, value);
 }
 
+export async function undoEditorChange(): Promise<void> {
+  const undo = (editorInstance as unknown as { undo?: () => Promise<void> })?.undo;
+  if (!editorInstance || !undo) return;
+  await ensureEditorReady();
+  await undo.call(editorInstance);
+  await refreshEditorCache();
+}
+
+export async function redoEditorChange(): Promise<void> {
+  const redo = (editorInstance as unknown as { redo?: () => Promise<void> })?.redo;
+  if (!editorInstance || !redo) return;
+  await ensureEditorReady();
+  await redo.call(editorInstance);
+  await refreshEditorCache();
+}
+
 export function initEditor(): void {
   if (editorInstance) {
     return;

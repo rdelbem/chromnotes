@@ -1,5 +1,5 @@
-import { importNotesStatus, noteIdInput, searchInput, titleInput } from "./dom";
-import { getEditorValue, initEditor, refreshEditorCache } from "./editor";
+import { importNotesStatus, noteIdInput, searchInput, titleInput, categoryInput } from "./dom";
+import { getEditorValue, initEditor, refreshEditorCache, setEditorContent } from "./editor";
 import { applyModalSize, closeModal, openModal } from "./modal";
 import { getState, getTotalPages, loadState, persistState, updateState } from "./state";
 import { Note, STORAGE_FALLBACK_KEY } from "./types";
@@ -16,6 +16,8 @@ import {
   applyAppearanceTheme
 } from "./controllers/settings-controller";
 import { registerNotesListRefresher, resetAutoSaveState } from "./controllers/autosave-controller";
+import { getFormSnapshot } from "./controllers/autosave-controller";
+import { primeHistory, redoNoteChange, undoNoteChange } from "./controllers/history-controller";
 import { parseNotesFromText, persistImportedNotes } from "./services/data-transfer";
 import { initAiController } from "./controllers/ai-controller";
 
@@ -32,6 +34,15 @@ function handleNoteSelection(note: Note): void {
   void persistState({ selectedNoteId: note.id });
   openModal("edit");
   resetAutoSaveState();
+  primeHistory(note.id, () => {
+    const snapshot = getFormSnapshot();
+    return {
+      title: snapshot.title,
+      category: snapshot.category,
+      content: snapshot.content,
+      contentRaw: snapshot.contentRaw
+    };
+  });
 }
 
 async function goToPage(page: number): Promise<void> {
@@ -187,6 +198,47 @@ async function handleCopyNote(): Promise<void> {
   }
 }
 
+function applySnapshotToForm(snapshot: {
+  title: string;
+  category: string;
+  content: string;
+  contentRaw: Note["contentRaw"];
+}): void {
+  titleInput.value = snapshot.title;
+  categoryInput.value = snapshot.category;
+  setEditorContent(snapshot.contentRaw, snapshot.content);
+}
+
+async function handleUndo(): Promise<void> {
+  await refreshEditorCache();
+  const noteId = noteIdInput.value || null;
+  if (!noteId) return;
+  const snapshot = getFormSnapshot();
+  const previous = undoNoteChange(noteId, {
+    title: snapshot.title,
+    category: snapshot.category,
+    content: snapshot.content,
+    contentRaw: snapshot.contentRaw
+  });
+  if (!previous) return;
+  applySnapshotToForm(previous);
+}
+
+async function handleRedo(): Promise<void> {
+  await refreshEditorCache();
+  const noteId = noteIdInput.value || null;
+  if (!noteId) return;
+  const snapshot = getFormSnapshot();
+  const next = redoNoteChange(noteId, {
+    title: snapshot.title,
+    category: snapshot.category,
+    content: snapshot.content,
+    contentRaw: snapshot.contentRaw
+  });
+  if (!next) return;
+  applySnapshotToForm(next);
+}
+
 function setupEventBindings(): void {
   bindEventListeners({
     onNewNote: () => {
@@ -208,6 +260,12 @@ function setupEventBindings(): void {
     },
     onCopyNote: () => {
       void handleCopyNote();
+    },
+    onUndo: () => {
+      void handleUndo();
+    },
+    onRedo: () => {
+      void handleRedo();
     }
   });
 }
@@ -232,6 +290,15 @@ export async function bootstrap(): Promise<void> {
     const current = initialState.notes.find((note) => note.id === initialState.selectedNoteId);
     if (current) {
       populateForm(current);
+      primeHistory(current.id, () => {
+        const snapshot = getFormSnapshot();
+        return {
+          title: snapshot.title,
+          category: snapshot.category,
+          content: snapshot.content,
+          contentRaw: snapshot.contentRaw
+        };
+      });
     } else {
       populateForm(null);
       await persistState({ selectedNoteId: null });

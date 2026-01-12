@@ -10,6 +10,8 @@ import {
   layoutChoiceInputs,
   modalBackdrop,
   modalCancelButton,
+  modalRedoButton,
+  modalUndoButton,
   modalCopyButton,
   modalMaximizeButton,
   newNoteButton,
@@ -59,6 +61,8 @@ type EventBindingOptions = {
   onGoToPreviousPage: () => void;
   onGoToNextPage: () => void;
   onCopyNote: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
 };
 
 export function bindEventListeners(options: EventBindingOptions): void {
@@ -76,6 +80,8 @@ export function bindEventListeners(options: EventBindingOptions): void {
 
   modalCancelButton.addEventListener("click", options.onModalDismiss);
   modalCopyButton.addEventListener("click", options.onCopyNote);
+  modalUndoButton.addEventListener("click", options.onUndo);
+  modalRedoButton.addEventListener("click", options.onRedo);
 
   modalBackdrop.addEventListener("click", (event) => {
     if (getState().viewMode === "list" && event.target === modalBackdrop) {
