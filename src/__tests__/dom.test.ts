@@ -75,7 +75,10 @@ function renderDom(
         <button id="modalMaximizeButton" type="button"></button>
         <button id="modalDeleteButton" type="button"></button>
         <button id="modalOrganizeButton" type="button"></button>
+        <button id="modalUndoButton" type="button"></button>
+        <button id="modalRedoButton" type="button"></button>
         <button id="modalCancelButton" type="button"></button>
+        <button id="modalCopyButton" type="button"></button>
         <button id="modalSaveButton" type="button"></button>
         <div id="noteAssistantBanner">
           <div>

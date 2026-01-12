@@ -1,5 +1,5 @@
-import { importNotesStatus, noteIdInput, searchInput } from "./dom";
-import { initEditor } from "./editor";
+import { importNotesStatus, noteIdInput, searchInput, titleInput, categoryInput } from "./dom";
+import { getEditorValue, initEditor, refreshEditorCache, setEditorContent } from "./editor";
 import { applyModalSize, closeModal, openModal } from "./modal";
 import { getState, getTotalPages, loadState, persistState, updateState } from "./state";
 import { Note, STORAGE_FALLBACK_KEY } from "./types";
@@ -16,6 +16,8 @@ import {
   applyAppearanceTheme
 } from "./controllers/settings-controller";
 import { registerNotesListRefresher, resetAutoSaveState } from "./controllers/autosave-controller";
+import { getFormSnapshot } from "./controllers/autosave-controller";
+import { primeHistory, redoNoteChange, undoNoteChange } from "./controllers/history-controller";
 import { parseNotesFromText, persistImportedNotes } from "./services/data-transfer";
 import { initAiController } from "./controllers/ai-controller";
 
@@ -32,6 +34,15 @@ function handleNoteSelection(note: Note): void {
   void persistState({ selectedNoteId: note.id });
   openModal("edit");
   resetAutoSaveState();
+  primeHistory(note.id, () => {
+    const snapshot = getFormSnapshot();
+    return {
+      title: snapshot.title,
+      category: snapshot.category,
+      content: snapshot.content,
+      contentRaw: snapshot.contentRaw
+    };
+  });
 }
 
 async function goToPage(page: number): Promise<void> {
@@ -154,6 +165,80 @@ function bindAiMergeListener(): void {
   });
 }
 
+async function copyTextToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function handleCopyNote(): Promise<void> {
+  await refreshEditorCache();
+  const content = getEditorValue().trim();
+  const title = titleInput.value.trim();
+  const textToCopy = [title, content].filter(Boolean).join("\n\n");
+  if (!textToCopy) {
+    return;
+  }
+  try {
+    await copyTextToClipboard(textToCopy);
+  } catch (error) {
+    console.error("Chromnotes: failed to copy note content.", error);
+  }
+}
+
+function applySnapshotToForm(snapshot: {
+  title: string;
+  category: string;
+  content: string;
+  contentRaw: Note["contentRaw"];
+}): void {
+  titleInput.value = snapshot.title;
+  categoryInput.value = snapshot.category;
+  setEditorContent(snapshot.contentRaw, snapshot.content);
+}
+
+async function handleUndo(): Promise<void> {
+  await refreshEditorCache();
+  const noteId = noteIdInput.value || null;
+  if (!noteId) return;
+  const snapshot = getFormSnapshot();
+  const previous = undoNoteChange(noteId, {
+    title: snapshot.title,
+    category: snapshot.category,
+    content: snapshot.content,
+    contentRaw: snapshot.contentRaw
+  });
+  if (!previous) return;
+  applySnapshotToForm(previous);
+}
+
+async function handleRedo(): Promise<void> {
+  await refreshEditorCache();
+  const noteId = noteIdInput.value || null;
+  if (!noteId) return;
+  const snapshot = getFormSnapshot();
+  const next = redoNoteChange(noteId, {
+    title: snapshot.title,
+    category: snapshot.category,
+    content: snapshot.content,
+    contentRaw: snapshot.contentRaw
+  });
+  if (!next) return;
+  applySnapshotToForm(next);
+}
+
 function setupEventBindings(): void {
   bindEventListeners({
     onNewNote: () => {
@@ -172,6 +257,15 @@ function setupEventBindings(): void {
     },
     onGoToNextPage: () => {
       void goToPage(getState().currentPage + 1);
+    },
+    onCopyNote: () => {
+      void handleCopyNote();
+    },
+    onUndo: () => {
+      void handleUndo();
+    },
+    onRedo: () => {
+      void handleRedo();
     }
   });
 }
@@ -196,6 +290,15 @@ export async function bootstrap(): Promise<void> {
     const current = initialState.notes.find((note) => note.id === initialState.selectedNoteId);
     if (current) {
       populateForm(current);
+      primeHistory(current.id, () => {
+        const snapshot = getFormSnapshot();
+        return {
+          title: snapshot.title,
+          category: snapshot.category,
+          content: snapshot.content,
+          contentRaw: snapshot.contentRaw
+        };
+      });
     } else {
       populateForm(null);
       await persistState({ selectedNoteId: null });

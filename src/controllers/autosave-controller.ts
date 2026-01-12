@@ -3,6 +3,7 @@ import { getEditorData, getEditorValue, refreshEditorCache } from "../editor";
 import { getState, persistState, generateId } from "../state";
 import { Note } from "../types";
 import { populateForm } from "../view";
+import { primeHistory, queueHistorySnapshot } from "./history-controller";
 
 const AUTO_SAVE_DELAY_MS = 60_000;
 const AUTO_SAVE_GLOW_DURATION_MS = 2_000;
@@ -39,7 +40,7 @@ function triggerAutoSaveGlow(): void {
   }, AUTO_SAVE_GLOW_DURATION_MS);
 }
 
-function getFormSnapshot(): {
+export function getFormSnapshot(): {
   id: string | null;
   title: string;
   content: string;
@@ -147,6 +148,15 @@ async function saveCurrentNote(reason: SaveReason): Promise<boolean> {
     autoSaveGlowTimer = null;
     modalSaveButton.classList.remove(AUTO_SAVE_GLOW_CLASS);
   }
+  if (selected) {
+    const snapshot = getFormSnapshot();
+    primeHistory(selected.id, () => ({
+      title: snapshot.title,
+      category: snapshot.category,
+      content: snapshot.content,
+      contentRaw: snapshot.contentRaw
+    }));
+  }
   return true;
 }
 
@@ -165,4 +175,13 @@ export function handleFormFieldChange(): void {
     return;
   }
   scheduleAutoSave();
+  queueHistorySnapshot(noteIdInput.value || null, () => {
+    const snapshot = getFormSnapshot();
+    return {
+      title: snapshot.title,
+      category: snapshot.category,
+      content: snapshot.content,
+      contentRaw: snapshot.contentRaw
+    };
+  });
 }
