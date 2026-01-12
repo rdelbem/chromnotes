@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/rdelbem/chromnotes/compare/v1.2.0...v1.3.0) (2026-01-12)
+
+
+### Features
+
+* add undo and redo buttons + tests ([80075d1](https://github.com/rdelbem/chromnotes/commit/80075d1c61af9d9adfba5dff0e2778f2e6457569))
+* copy to clipboard button ([3e6c31e](https://github.com/rdelbem/chromnotes/commit/3e6c31e990586f47bcee92522a3a34623422215d))
+
 # [1.2.0](https://github.com/rdelbem/chromnotes/compare/v1.1.3...v1.2.0) (2025-12-05)
 
 
