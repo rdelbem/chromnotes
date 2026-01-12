@@ -385,4 +385,96 @@ describe("app interactions", () => {
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
   });
+
+  test("copy button writes title and content to clipboard", async () => {
+    const note = createNote({
+      id: "copy-note",
+      title: "Copy Title",
+      content: "Copy Content",
+      contentRaw: {
+        blocks: [{ type: "paragraph", data: { text: "Copy Content" } }]
+      } as Note["contentRaw"]
+    });
+    withSnapshot({
+      notes: [note],
+      selectedNoteId: note.id,
+      categoryIndex: { [note.category]: [note.id] }
+    });
+    mockEditor({
+      saveResult: {
+        blocks: [{ type: "paragraph", data: { text: "Copy Content" } }]
+      }
+    });
+    const clipboardMock = { writeText: jest.fn(() => Promise.resolve()) };
+    (navigator as unknown as { clipboard: typeof clipboardMock }).clipboard = clipboardMock;
+
+    await bootstrapApp();
+
+    const noteCard = document.querySelector(".note-card") as HTMLLIElement;
+    noteCard.click();
+    await flushAsync();
+
+    const copyButton = document.getElementById("modalCopyButton") as HTMLButtonElement;
+    copyButton.click();
+    await flushAsync();
+    await flushAsync();
+
+    expect(clipboardMock.writeText).toHaveBeenCalledWith("Copy Title\n\nCopy Content");
+  });
+
+  test("copy button falls back to execCommand when clipboard API is unavailable", async () => {
+    const note = createNote({
+      id: "copy-fallback",
+      title: "Fallback Title",
+      content: "Fallback Content",
+      contentRaw: {
+        blocks: [{ type: "paragraph", data: { text: "Fallback Content" } }]
+      } as Note["contentRaw"]
+    });
+    withSnapshot({
+      notes: [note],
+      selectedNoteId: note.id,
+      categoryIndex: { [note.category]: [note.id] }
+    });
+    mockEditor({
+      saveResult: {
+        blocks: [{ type: "paragraph", data: { text: "Fallback Content" } }]
+      }
+    });
+
+    const originalClipboard = (navigator as unknown as { clipboard?: unknown }).clipboard;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (navigator as any).clipboard;
+    const originalExecCommand = (
+      document as Document & {
+        execCommand?: (commandId: string) => boolean;
+      }
+    ).execCommand;
+    const execCommandMock = jest.fn(() => true);
+    (document as Document & { execCommand?: typeof execCommandMock }).execCommand = execCommandMock;
+
+    await bootstrapApp();
+
+    const noteCard = document.querySelector(".note-card") as HTMLLIElement;
+    noteCard.click();
+    await flushAsync();
+
+    const copyButton = document.getElementById("modalCopyButton") as HTMLButtonElement;
+    copyButton.click();
+    await flushAsync();
+    await flushAsync();
+
+    expect(execCommandMock).toHaveBeenCalledWith("copy");
+
+    if (originalExecCommand) {
+      (document as Document & { execCommand?: typeof originalExecCommand }).execCommand =
+        originalExecCommand;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (document as any).execCommand;
+    }
+    if (originalClipboard) {
+      (navigator as unknown as { clipboard?: unknown }).clipboard = originalClipboard;
+    }
+  });
 });

@@ -51,6 +51,7 @@ export const exportNotesButton = requireElement<HTMLButtonElement>("exportNotesB
 export const importNotesInput = requireElement<HTMLInputElement>("importNotesInput");
 export const importNotesStatus = requireElement<HTMLParagraphElement>("importNotesStatus");
 export const modalDeleteButton = requireElement<HTMLButtonElement>("modalDeleteButton");
+export const modalCopyButton = requireElement<HTMLButtonElement>("modalCopyButton");
 export const modalSaveButton = requireElement<HTMLButtonElement>("modalSaveButton");
 export const noteAssistantBanner = requireElement<HTMLDivElement>("noteAssistantBanner");
 export const noteAssistantText = requireElement<HTMLParagraphElement>("noteAssistantText");

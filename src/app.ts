@@ -1,5 +1,5 @@
-import { importNotesStatus, noteIdInput, searchInput } from "./dom";
-import { initEditor } from "./editor";
+import { importNotesStatus, noteIdInput, searchInput, titleInput } from "./dom";
+import { getEditorValue, initEditor, refreshEditorCache } from "./editor";
 import { applyModalSize, closeModal, openModal } from "./modal";
 import { getState, getTotalPages, loadState, persistState, updateState } from "./state";
 import { Note, STORAGE_FALLBACK_KEY } from "./types";
@@ -154,6 +154,39 @@ function bindAiMergeListener(): void {
   });
 }
 
+async function copyTextToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function handleCopyNote(): Promise<void> {
+  await refreshEditorCache();
+  const content = getEditorValue().trim();
+  const title = titleInput.value.trim();
+  const textToCopy = [title, content].filter(Boolean).join("\n\n");
+  if (!textToCopy) {
+    return;
+  }
+  try {
+    await copyTextToClipboard(textToCopy);
+  } catch (error) {
+    console.error("Chromnotes: failed to copy note content.", error);
+  }
+}
+
 function setupEventBindings(): void {
   bindEventListeners({
     onNewNote: () => {
@@ -172,6 +205,9 @@ function setupEventBindings(): void {
     },
     onGoToNextPage: () => {
       void goToPage(getState().currentPage + 1);
+    },
+    onCopyNote: () => {
+      void handleCopyNote();
     }
   });
 }
