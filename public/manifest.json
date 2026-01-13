@@ -3,9 +3,7 @@
   "name": "Chromnotes",
   "description": "A sleek new tab note-taking experience with theme persistence.",
   "version": "1.3.0",
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "icons": {
     "16": "images/icon.png",
     "48": "images/icon.png",
