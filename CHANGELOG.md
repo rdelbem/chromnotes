@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/rdelbem/chromnotes/compare/v1.4.0...v1.5.0) (2026-01-13)
+
+
+### Features
+
+* add manual trigger to publish extension ([01de8b2](https://github.com/rdelbem/chromnotes/commit/01de8b28c7ac4878f43c5c2ffb12a9195f535b2a))
+
 # [1.4.0](https://github.com/rdelbem/chromnotes/compare/v1.3.0...v1.4.0) (2026-01-13)
 
 
