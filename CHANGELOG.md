@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/rdelbem/chromnotes/compare/v1.3.0...v1.4.0) (2026-01-13)
+
+
+### Features
+
+* add manual trigger for release action ([2ea5f56](https://github.com/rdelbem/chromnotes/commit/2ea5f56fc0237df981cb189edae06e9443c182ae))
+
 # [1.3.0](https://github.com/rdelbem/chromnotes/compare/v1.2.0...v1.3.0) (2026-01-12)
 
 
