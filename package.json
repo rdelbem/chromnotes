@@ -57,6 +57,6 @@
     "@editorjs/raw": "2.5.1",
     "@editorjs/simple-image": "1.6.0",
     "nice-select2": "2.4.1",
-    "zustand": "5.0.9"
+    "zustand": "5.0.10"
   }
 }
