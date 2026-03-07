@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chromnotes</title>
+    <script type="module" crossorigin src="/assets/index-B4PJDhPT.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B2r0Cfml.css">
+  </head>
+  <body data-theme="dark" data-appearance-theme="classic">
+    <div class="app">
+      <header class="app-header">
+        <div class="title-group">
+          <img class="app-icon" src="/assets/icon-exyECB-_.png" alt="" aria-hidden="true" />
+          <h1>Chromnotes</h1>
+          <p class="subtitle">Capture quick notes every time you open a new tab.</p>
+        </div>
+        <div class="header-actions">
+          <div id="headerSearchSlot" class="header-search-slot"></div>
+          <div class="settings-container">
+            <button
+              id="settingsButton"
+              class="ghost-button icon-button"
+              type="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="settingsPanel"
+            >
+              ⚙️
+            </button>
+            <div
+              id="settingsPanel"
+              class="settings-panel hidden"
+              role="dialog"
+              aria-label="Appearance settings"
+              aria-modal="true"
+              tabindex="-1"
+              hidden
+            >
+              <button
+                id="settingsCloseButton"
+                class="ghost-button settings-close-button"
+                type="button"
+                aria-label="Close settings"
+              >
+                ✕
+              </button>
+              <div class="settings-tabs" role="tablist" aria-label="Settings sections">
+                <button
+                  id="settingsTabPalettesButton"
+                  class="settings-tab settings-tab--active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="settingsTabPalettes"
+                  data-settings-tab="palettes"
+                >
+                  Palettes
+                </button>
+                <button
+                  id="settingsTabThemesButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabThemes"
+                  data-settings-tab="themes"
+                  tabindex="-1"
+                >
+                  Themes
+                </button>
+                <button
+                  id="settingsTabLayoutButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabLayout"
+                  data-settings-tab="layout"
+                  tabindex="-1"
+                >
+                  Layout
+                </button>
+                <button
+                  id="settingsTabDataButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabData"
+                  data-settings-tab="data"
+                  tabindex="-1"
+                >
+                  Data
+                </button>
+                <button
+                  id="settingsTabAiButton"
+                  class="settings-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="settingsTabAi"
+                  data-settings-tab="ai"
+                  tabindex="-1"
+                >
+                  AI integration
+                </button>
+              </div>
+              <div
+                id="settingsTabPalettes"
+                class="settings-tabpanel is-active"
+                role="tabpanel"
+                aria-labelledby="settingsTabPalettesButton"
+                data-settings-panel="palettes"
+              >
+                <h3 class="settings-panel-title">Palette</h3>
+                <div class="theme-options" role="radiogroup" aria-label="Theme">
+                  <label class="theme-option" data-theme="light">
+                    <input type="radio" name="themeChoice" value="light" />
+                    <span class="theme-option-name">Light</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip"></span>
+                      <span class="color-chip" data-color="green"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="dawn">
+                    <input type="radio" name="themeChoice" value="dawn" />
+                    <span class="theme-option-name">Dawn Glow</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                      <span class="color-chip" data-color="purple"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="paper">
+                    <input type="radio" name="themeChoice" value="paper" />
+                    <span class="theme-option-name">Paper White</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="green"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="dark">
+                    <input type="radio" name="themeChoice" value="dark" />
+                    <span class="theme-option-name">Midnight</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="dracula">
+                    <input type="radio" name="themeChoice" value="dracula" />
+                    <span class="theme-option-name">Dracula</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="green"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                      <span class="color-chip" data-color="purple"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="midnight">
+                    <input type="radio" name="themeChoice" value="midnight" />
+                    <span class="theme-option-name">Midnight Deep</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                      <span class="color-chip" data-color="purple"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="forest">
+                    <input type="radio" name="themeChoice" value="forest" />
+                    <span class="theme-option-name">Forest Night</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="green"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="github">
+                    <input type="radio" name="themeChoice" value="github" />
+                    <span class="theme-option-name">GitHub Dark</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                    </span>
+                  </label>
+                  <label class="theme-option" data-theme="girly-girl">
+                    <input type="radio" name="themeChoice" value="girly-girl" />
+                    <span class="theme-option-name">Girly Girl</span>
+                    <span class="theme-option-swatches">
+                      <span class="color-chip" data-color="yellow"></span>
+                      <span class="color-chip" data-color="cyan"></span>
+                      <span class="color-chip" data-color="purple"></span>
+                    </span>
+                  </label>
+                </div>
+                <p class="settings-description">
+                  Pick your favorite color palette above, then pair it with an interface theme below
+                  — every combination works.
+                </p>
+              </div>
+              <div
+                id="settingsTabThemes"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabThemesButton"
+                data-settings-panel="themes"
+                hidden
+              >
+                <h3 class="settings-panel-title">Theme</h3>
+                <p class="settings-description">
+                  Choose the interface layout that matches your flow.
+                </p>
+                <div class="appearance-options" role="radiogroup" aria-label="Interface theme">
+                  <label class="appearance-option" data-appearance-theme="classic">
+                    <input type="radio" name="appearanceThemeChoice" value="classic" />
+                    <span class="appearance-option-copy">
+                      <span class="appearance-option-name">Classic</span>
+                      <span class="appearance-option-description">
+                        Rounded cards & comfortable spacing
+                      </span>
+                    </span>
+                  </label>
+                  <label class="appearance-option" data-appearance-theme="windup">
+                    <input type="radio" name="appearanceThemeChoice" value="windup" />
+                    <span class="appearance-option-copy">
+                      <span class="appearance-option-name">Windup</span>
+                      <span class="appearance-option-description">
+                        Sleek night mode with pill inputs and sidebar contrast
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div
+                id="settingsTabLayout"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabLayoutButton"
+                data-settings-panel="layout"
+                hidden
+              >
+                <h3 class="settings-panel-title">Layout</h3>
+                <div class="layout-options" role="radiogroup" aria-label="View mode">
+                  <label class="layout-option" data-layout="list">
+                    <input type="radio" name="layoutChoice" value="list" />
+                    <span>List</span>
+                  </label>
+                  <label class="layout-option" data-layout="desktop">
+                    <input type="radio" name="layoutChoice" value="desktop" />
+                    <span>Desktop</span>
+                  </label>
+                </div>
+                <label class="toggle-row" for="compactToggle">
+                  <div class="toggle-copy">
+                    <span class="toggle-title">Compact note cards</span>
+                    <span class="toggle-description">Show more notes with denser spacing</span>
+                  </div>
+                  <input type="checkbox" id="compactToggle" />
+                </label>
+                <!-- TODO: Enable sync toggle when UX/support is finalized -->
+                <div class="settings-subtitle hidden">Sync</div>
+                <label class="toggle-row hidden" for="syncToggle">
+                  <div class="toggle-copy">
+                    <span class="toggle-title">Sync across devices</span>
+                    <span class="toggle-description"
+                      >Keep notes and settings using Chrome sync</span
+                    >
+                  </div>
+                  <input type="checkbox" id="syncToggle" />
+                </label>
+              </div>
+              <div
+                id="settingsTabData"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabDataButton"
+                data-settings-panel="data"
+                hidden
+              >
+                <h3 class="settings-panel-title">Data</h3>
+                <div class="settings-actions">
+                  <button
+                    id="exportNotesButton"
+                    class="ghost-button settings-action-button"
+                    type="button"
+                  >
+                    Export notes (.txt)
+                  </button>
+                  <label class="settings-file-button" for="importNotesInput">
+                    <input
+                      id="importNotesInput"
+                      class="settings-file-input"
+                      type="file"
+                      accept="text/plain,application/json"
+                    />
+                    <span>Import notes (.txt)</span>
+                  </label>
+                  <p
+                    id="importNotesStatus"
+                    class="settings-import-status"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </div>
+              <div
+                id="settingsTabAi"
+                class="settings-tabpanel"
+                role="tabpanel"
+                aria-labelledby="settingsTabAiButton"
+                data-settings-panel="ai"
+                hidden
+              >
+                <h3 class="settings-panel-title">AI brain</h3>
+                <p class="settings-description">
+                  Provide your OpenAI API key to let Chromnotes ask ChatGPT whether the current note
+                  covers the same subject as other notes. The key stays on this device and is only
+                  sent to OpenAI when you click the AI brain button.
+                </p>
+                <div class="ai-settings" aria-label="AI brain settings">
+                  <div class="ai-key-row">
+                    <label class="sr-only" for="aiApiKeyInput">OpenAI API key</label>
+                    <input
+                      id="aiApiKeyInput"
+                      class="ai-key-input"
+                      type="password"
+                      placeholder="sk-..."
+                      autocomplete="off"
+                    />
+                    <button id="aiApiKeySaveButton" class="ghost-button" type="button">
+                      Save key
+                    </button>
+                    <button
+                      id="aiApiKeyClearButton"
+                      class="ghost-button danger-button"
+                      type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <p
+                    id="aiApiKeyStatus"
+                    class="ai-settings-status"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <label class="theme-toggle">
+            <input type="checkbox" id="themeToggle" />
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">Dark mode</span>
+          </label>
+          <a
+            id="donateButton"
+            class="donate-button"
+            href="https://buymeacoffee.com/rodrigodeld"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Donate
+          </a>
+          <button id="newNoteButton" class="ghost-button" type="button">New note</button>
+        </div>
+      </header>
+      <div id="settingsOverlay" class="settings-overlay hidden" role="presentation" hidden></div>
+      <div class="layout-columns">
+        <main class="main-content">
+          <section class="notes-panel">
+            <div class="list-header">
+              <h2>Notes</h2>
+              <div id="listSearchHome" class="list-search-home">
+                <div id="searchFieldWrapper" class="search-field-wrapper">
+                  <input id="searchInput" type="search" placeholder="Search notes..." />
+                </div>
+              </div>
+              <select id="categoryFilter" aria-label="Filter by category"></select>
+            </div>
+            <ul id="notesContainer" aria-live="polite"></ul>
+            <p id="emptyState" class="empty-state">
+              No notes yet. Start writing and they will appear here.
+            </p>
+            <nav
+              id="paginationControls"
+              class="pagination hidden"
+              aria-label="Notes pagination"
+              hidden
+            >
+              <button id="prevPageButton" class="ghost-button" type="button">Previous</button>
+              <span id="paginationStatus" class="pagination-status" aria-live="polite"></span>
+              <button id="nextPageButton" class="ghost-button" type="button">Next</button>
+            </nav>
+          </section>
+        </main>
+        <div id="modalBackdrop" class="modal-backdrop hidden" role="presentation" hidden>
+          <div
+            id="noteModal"
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Chromnotes editor"
+          >
+            <header class="modal-header">
+              <div class="modal-header-actions">
+                <button
+                  id="modalMaximizeButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Maximize note editor"
+                >
+                  ⤢
+                </button>
+                <button
+                  id="modalDeleteButton"
+                  class="ghost-button icon-button danger-icon"
+                  type="button"
+                  aria-label="Delete note"
+                  disabled
+                >
+                  🗑️
+                </button>
+                <button
+                  id="modalOrganizeButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Run AI brain"
+                  disabled
+                >
+                  🧠
+                </button>
+                <button
+                  id="modalUndoButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Undo"
+                >
+                  ↺
+                </button>
+                <button
+                  id="modalRedoButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Redo"
+                >
+                  ↻
+                </button>
+                <button
+                  id="modalCancelButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
+                <button
+                  id="modalCopyButton"
+                  class="ghost-button icon-button"
+                  type="button"
+                  aria-label="Copy note content"
+                >
+                  📋
+                </button>
+                <button
+                  id="modalSaveButton"
+                  class="ghost-button icon-button"
+                  type="submit"
+                  aria-label="Save note"
+                  form="noteForm"
+                >
+                  💾
+                </button>
+              </div>
+            </header>
+            <form id="noteForm" class="modal-form" autocomplete="off">
+              <input type="hidden" id="noteId" />
+              <div
+                id="noteAssistantBanner"
+                class="note-assistant-banner"
+                role="status"
+                aria-live="polite"
+                hidden
+              >
+                <div class="note-assistant-main">
+                  <p id="noteAssistantText" class="note-assistant-text"></p>
+                  <button
+                    id="noteAssistantMergeButton"
+                    class="note-assistant-action"
+                    type="button"
+                    hidden
+                  >
+                    Merge related notes with AI
+                  </button>
+                </div>
+                <button
+                  id="noteAssistantDismissButton"
+                  class="note-assistant-dismiss"
+                  type="button"
+                  aria-label="Dismiss AI brain message"
+                >
+                  ✕
+                </button>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="noteTitle">Title</label>
+                  <input
+                    id="noteTitle"
+                    name="noteTitle"
+                    type="text"
+                    placeholder="Give your note a title"
+                  />
+                </div>
+                <div class="field">
+                  <label for="noteCategory">Category</label>
+                  <input
+                    id="noteCategory"
+                    name="noteCategory"
+                    type="text"
+                    placeholder="e.g. Planning, Research, Personal"
+                  />
+                </div>
+              </div>
+              <div class="field field--grow">
+                <label for="noteContent">Note</label>
+                <div
+                  id="noteContent"
+                  class="editor"
+                  data-placeholder="Write your thoughts here..."
+                ></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
